@@ -5,9 +5,10 @@ import util
 from util import DynamicCollisionCircle
 
 
-ROTATE_SPEED = 100.0
+ROTATE_SPEED = 180.0
 THRUST_STRENGTH = 25.0
 MAX_SPEED = 25.0
+BRAKE_STRENGTH = 0.45
 COLLISION_RADIUS = 1.25
 
 
@@ -24,13 +25,18 @@ class Player(DynamicCollisionCircle):
             self.angle -= ROTATE_SPEED * delta
         self.angle = util.wrap(self.angle, 0, 360)
         
+        # thrust
         if keys[pygame.K_UP]:
             thrust_vector: Vector2 = Vector2.from_polar((1, self.angle)) * THRUST_STRENGTH
             thrust_vector.y *= -1
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
-    
+         
+        # braking
+        if keys[pygame.K_SPACE]:
+            self.velocity.move_towards_ip(Vector2(0, 0), BRAKE_STRENGTH)
 
+    
     def draw(self, surf: Surface, resource_manager: ResourceManager):
         surf_center = Vector2(surf.get_size()) / 2
         player_sprite = resource_manager.get_image('player')
