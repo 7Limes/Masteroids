@@ -22,6 +22,15 @@ class CollisionCircle:
     def hits(self, other: "CollisionCircle"):
         dist = self.position.distance_to(other.position)
         return dist <= self.radius + other.radius and dist >= abs(self.radius - other.radius)
+    
+    
+    def get_bounding_box(self) -> pygame.Rect:
+        return pygame.Rect(
+            self.position.x - self.radius,
+            self.position.y - self.radius,
+            self.radius * 2,
+            self.radius * 2
+        )
 
 
     # Debug draw function
@@ -53,3 +62,8 @@ def screen_to_world(surf: Surface, view_pos: Vector2, point: Vector2, scale) -> 
     surf_width, surf_height = surf.get_size()
     center = surf_width / 2, surf_height / 2
     return (point - center) / scale + view_pos
+
+
+def get_viewport_rect(surf: Surface, view_pos: Vector2) -> pygame.Rect:
+    half_viewport_size = Vector2(surf.get_size()) / 2
+    return surf.get_rect().scale_by(1 / RENDER_SCALE).move(view_pos - half_viewport_size)

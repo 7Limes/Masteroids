@@ -7,6 +7,8 @@ from player import Player
 from resource_manager import ResourceManager
 from hazards.asteroid import Asteroid
 import level_path
+import util
+from util import CollisionCircle
 
 
 def load_resources(resource_manager: ResourceManager):
@@ -16,6 +18,11 @@ def load_resources(resource_manager: ResourceManager):
 
 def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
     surf.blit(font.render(text, True, (255, 255, 255)), position)
+
+
+def get_rendered_objects(win: pygame.Surface, view_pos: pygame.Vector2, level_objects: list[CollisionCircle]) -> list[CollisionCircle]:
+    viewport = util.get_viewport_rect(win, view_pos)
+    return [o for o in level_objects if viewport.colliderect(o.get_bounding_box())]
 
 
 def main():
@@ -29,12 +36,12 @@ def main():
     load_resources(resource_manager)
 
     player = Player()
-    asteroids = [
+    level_objects = [
         Asteroid(pygame.Vector2(20, 20), 5, pygame.Vector2(-1, -0.5)),
         Asteroid(pygame.Vector2(15, -10), 4, pygame.Vector2(-2, 1))
     ]
 
-    path = level_path.generate_path(pygame.Vector2(0, 0), pygame.Vector2(-100, -100), 5, 45, 5)
+    path = level_path.generate_path(pygame.Vector2(0, 0), pygame.Vector2(-300, -300), 5, 45, 5)
 
     delta: float = 0.0
     run = True
@@ -48,13 +55,15 @@ def main():
         player.handle_input(delta, keys)
         player.update(delta)
 
+        for obj in level_objects:
+            obj.update(delta)
 
         win.fill((0, 0, 0))
 
         player.draw(win, resource_manager)
-        for a in asteroids:
-            a.update(delta)
-            a.draw(win, player.position, resource_manager)
+        rendered_objects = get_rendered_objects(win, player.position, level_objects)
+        for obj in rendered_objects:
+            obj.draw(win, player.position, resource_manager)
         
         level_path.draw_path(win, player.position, path)
 
@@ -62,6 +71,7 @@ def main():
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
         draw_debug_label(win, font, f'vel: {player.velocity}', (0, 40))
         draw_debug_label(win, font, f'angle: {player.angle:.1f}', (0, 60))
+        draw_debug_label(win, font, f'drawn objs: {len(rendered_objects)}', (0, 80))
 
 
         delta = clock.tick(60) / 1000.0
