@@ -47,7 +47,8 @@ class DestructibleAsteroid(Asteroid):
         if self.health <= 0:
             self.destroyed = True
             sprites = resource_manager.get_full_spritesheet('fragments')
-            effect = ParticleEffect(30, self.position, 0, 360, 0, 200, 5, 1, 2, 0.2, sprites)
+            particle_count = math.floor(8 * math.sqrt(self.radius) + 3)
+            effect = ParticleEffect(particle_count, self.position, 0, 360, 0, 200, 3.5, 1, 2, 0.2, sprites)
             particle_effects.append(effect)
             resource_manager.get_sound('explosion').play()
         else:
