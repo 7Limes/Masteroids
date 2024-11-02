@@ -2,4 +2,4 @@
 
 
 - Make render scale adjust to window size
-- Make destroyed objects drop coins or smth
+- Pitch hit sounds based on asteroid health

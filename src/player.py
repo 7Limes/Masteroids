@@ -4,7 +4,8 @@ from pygame import Vector2, Surface
 import util
 from util import DynamicCollisionCircle
 from objects.asteroid import Asteroid
-from globals import resource_manager, added_level_objects
+from objects.coin import Coin
+from globals import resource_manager
 
 
 ROTATE_SPEED = 180.0
@@ -85,6 +86,11 @@ class Player(DynamicCollisionCircle):
 
     def update(self, delta: float, level_objects: list[util.CollisionCircle]):
         super().update(delta)
+        for obj in level_objects:
+            if not self.hits(obj):
+                continue
+            if isinstance(obj, Coin):
+                obj.queue_delete = True
         
         self.bullets = [b for b in self.bullets if not b.update(delta, level_objects)]
         self.shoot_cooldown = util.move_toward(self.shoot_cooldown, 0, delta)

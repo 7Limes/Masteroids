@@ -22,7 +22,7 @@ class Asteroid(util.LevelObject):
 
     def destroy(self):
         global resource_manager, particle_effects
-        self.destroyed = True
+        self.queue_delete = True
         sprites = resource_manager.get_full_spritesheet('fragments')
         particle_count = math.floor(8 * math.sqrt(self.radius) + 3)
         effect = ParticleEffect(particle_count, self.position, 0, 360, 0, 200, 3.5, 1, 2, 0.2, sprites)
@@ -42,7 +42,6 @@ class Asteroid(util.LevelObject):
     def update(self, delta: float) -> bool:
         super().update(delta)
         self.shake_cooldown = util.move_toward(self.shake_cooldown, 0, delta)
-        return self.destroyed
 
 
     def draw(self, surf: Surface, view_pos: Vector2):

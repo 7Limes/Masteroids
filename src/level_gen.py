@@ -38,12 +38,12 @@ def generate_asteroid(position: Vector2):
 
 
 # Creates a path and populates it with objects.
-def generate_level() -> tuple[list[Vector2], list[util.CollisionCircle]]:
+def generate_level() -> tuple[list[Vector2], list[util.LevelObject]]:
     end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
     amount_points = random.randrange(7, 15)
     path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
 
-    level_objects: list[util.CollisionCircle] = []
+    level_objects: list[util.LevelObject] = []
     for p1, p2 in zip(path_points[1:], path_points[2:]):
         line_length = p1.distance_to(p2)
         shift_vector = (p2 - p1).normalize()

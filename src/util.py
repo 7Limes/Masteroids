@@ -81,7 +81,6 @@ class DynamicCollisionCircle(CollisionCircle):
 
     def update(self, delta: float):
         self.position += self.velocity * delta
-        return False
 
 
 def wrap(x: float, lower: float, upper: float) -> float:
@@ -121,6 +120,8 @@ class LevelObject(DynamicCollisionCircle):
         self.sprite = pygame.transform.scale(sprite, Vector2(scaled_sprite_size, scaled_sprite_size))
         self.sprite_half_size = Vector2(scaled_sprite_size, scaled_sprite_size) / 2
 
+        self.queue_delete = False
+
 
     def draw(self, surf: Surface, view_pos: Vector2, screen_coord_offset: Vector2=Vector2(0, 0)):
         screen_coord = self.get_screen_coord(surf, view_pos) + screen_coord_offset
@@ -142,6 +143,6 @@ class AnimatedLevelObject(LevelObject):
     def update(self, delta: float):
         self.animation_manager.update(delta)
         self.sprite = self.animation_manager.get_current_frame()
-        return super().update(delta)
+        super().update(delta)
     
     

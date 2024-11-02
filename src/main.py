@@ -47,8 +47,9 @@ def main():
         player.handle_input(delta, keys)
         player.update(delta, level_objects)
 
-        
-        level_objects = [o for o in level_objects if not o.update(delta)]
+        for obj in level_objects:
+            obj.update(delta)
+        level_objects = [o for o in level_objects if not o.queue_delete]
         level_objects.extend(added_level_objects)
         added_level_objects.clear()
 

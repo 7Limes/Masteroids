@@ -1,7 +1,6 @@
-from pygame import Vector2, Surface
+from pygame import Vector2
 import util
 from globals import resource_manager
-from resource_manager import AnimationManager
 
 
 RADIUS = 0.75
