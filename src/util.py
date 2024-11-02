@@ -54,13 +54,13 @@ def wrap(x: float, lower: float, upper: float) -> float:
 
 def world_to_screen(surf: Surface, view_pos: Vector2, point: Vector2, scale) -> Vector2:
     surf_width, surf_height = surf.get_size()
-    center = surf_width / 2, surf_height / 2
+    center = surf_width / 2.0, surf_height / 2.0
     return (point - view_pos) * scale + center
 
 
 def screen_to_world(surf: Surface, view_pos: Vector2, point: Vector2, scale) -> Vector2:
     surf_width, surf_height = surf.get_size()
-    center = surf_width / 2, surf_height / 2
+    center = surf_width / 2.0, surf_height / 2.0
     return (point - center) / scale + view_pos
 
 
