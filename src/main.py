@@ -16,7 +16,7 @@ def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, po
 
 
 def main():
-    win = pygame.display.set_mode((500, 500), pygame.DOUBLEBUF)
+    win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE)
     pygame.display.set_caption('asteroids game')
     clock = pygame.time.Clock()
 
@@ -36,13 +36,21 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
         
+        keys = pygame.key.get_pressed()
+
+        player.handle_input(delta, keys)
+        player.update(delta)
+
+
         win.fill((0, 0, 0))
-        
+
         player.draw(win, resource_manager)
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
         draw_debug_label(win, font, f'vel: {player.velocity}', (0, 40))
+        draw_debug_label(win, font, f'angle: {player.angle:.1f}', (0, 60))
+
 
         delta = clock.tick(60) / 1000.0
         pygame.display.flip()
