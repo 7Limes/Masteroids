@@ -9,7 +9,7 @@ import util
 from util import CollisionCircle
 
 import globals
-from globals import particle_effects
+from globals import particle_effects, added_level_objects
 
 
 def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
@@ -22,6 +22,7 @@ def get_rendered_objects(win: pygame.Surface, view_pos: pygame.Vector2, level_ob
 
 
 def main():
+    global added_level_objects, particle_effects
     win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
     pygame.display.set_caption('asteroids game')
     clock = pygame.time.Clock()
@@ -46,7 +47,10 @@ def main():
         player.handle_input(delta, keys)
         player.update(delta, level_objects)
 
+        
         level_objects = [o for o in level_objects if not o.update(delta)]
+        level_objects.extend(added_level_objects)
+        added_level_objects.clear()
 
         win.fill((0, 0, 0))
 

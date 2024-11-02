@@ -4,8 +4,7 @@ from pygame import Vector2, Surface
 import util
 from util import DynamicCollisionCircle
 from objects.asteroid import Asteroid
-from level_gen import LevelObject
-from globals import resource_manager
+from globals import resource_manager, added_level_objects
 
 
 ROTATE_SPEED = 180.0
@@ -13,10 +12,8 @@ THRUST_STRENGTH = 25.0
 MAX_SPEED = 30.0
 BRAKE_STRENGTH = 0.55
 COLLISION_RADIUS = 1.25
-MASS = 1.0
 
 BULLET_RADIUS = 0.2
-BULLET_MASS = 0.25
 BULLET_SPEED = 20.0
 SHOOT_COOLDOWN = 0.4
 BULLET_LIFETIME = 3.0
@@ -24,17 +21,17 @@ BULLET_LIFETIME = 3.0
 
 class PlayerBullet(DynamicCollisionCircle):
     def __init__(self, position: Vector2, velocity: Vector2):
-        super().__init__(position, BULLET_RADIUS, velocity, BULLET_MASS)
+        super().__init__(position, BULLET_RADIUS, velocity)
         self.lifetime = BULLET_LIFETIME
     
-    def update(self, delta: float, level_objects: list[LevelObject]) -> bool:
+    def update(self, delta: float, level_objects: list[util.CollisionCircle]) -> bool:
         super().update(delta)
         for obj in level_objects:
             if not self.hits(obj):
                 continue
             if isinstance(obj, Asteroid):
                 obj.damage()
-            return True
+                return True
                 
         self.lifetime -= delta
         return self.lifetime <= 0
@@ -47,7 +44,7 @@ class PlayerBullet(DynamicCollisionCircle):
 
 class Player(DynamicCollisionCircle):
     def __init__(self):
-        super().__init__(Vector2(0, 0), COLLISION_RADIUS, Vector2(0, 0), MASS)
+        super().__init__(Vector2(0, 0), COLLISION_RADIUS, Vector2(0, 0))
         self.angle: float = 0.0
 
         self.bullets: list[PlayerBullet] = []
@@ -87,12 +84,6 @@ class Player(DynamicCollisionCircle):
     
 
     def update(self, delta: float, level_objects: list[util.CollisionCircle]):
-        for obj in level_objects:
-            dist_squared = self.position.distance_squared_to(obj.position)
-            gravity_accel = util.GRAVITATIONAL_CONSTANT * (self.mass * obj.mass / dist_squared)
-            gravity_vector = (obj.position - self.position) * gravity_accel
-            self.velocity += gravity_vector
-        
         super().update(delta)
         
         self.bullets = [b for b in self.bullets if not b.update(delta, level_objects)]

@@ -44,3 +44,20 @@ class ResourceManager:
 
     def get_sound(self, sound_id: str) -> mixer.Sound:
         return self.sounds[sound_id]
+
+
+class AnimationManager:
+    def __init__(self, sprites: list[Surface], frame_duration: float):
+        self.sprites = sprites
+        self.frame_index: int = 0
+        self.frame_duration = frame_duration
+        self.frame_timer = 0.0
+
+    def update(self, delta: float):
+        self.frame_timer += delta
+        if self.frame_timer > self.frame_duration:
+            self.frame_index  = (self.frame_index + 1) % len(self.sprites)
+            self.frame_timer = 0.0
+
+    def get_current_frame(self) -> Surface:
+        return self.sprites[self.frame_index]

@@ -1,16 +1,9 @@
 import random
 import math
-from typing import Union
 import pygame
 from pygame import Vector2, Surface
 import util
-from objects.asteroid import Asteroid, DestructibleAsteroid
-
-
-LevelObject = Union[
-    Asteroid,
-    DestructibleAsteroid
-]
+from objects.asteroid import Asteroid, CoinAsteroid
 
 
 def generate_path(start: Vector2, end: Vector2, amount_points: int, angle_variance: float, length_variance: float) -> list[Vector2]:
@@ -39,8 +32,8 @@ def draw_path(surf: Surface, view_pos: Vector2, points: list[Vector2]):
 def generate_asteroid(position: Vector2):
     ast_size = random.randint(4, 12) / 2.0
     if random.randrange(0, 5) == 0:
-        return DestructibleAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
-    return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
+        return CoinAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
+    return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
 
 
 

@@ -2,55 +2,65 @@ import math
 import random
 import pygame
 from pygame import Vector2, Surface
+
 import util
 from particle.particle import ParticleEffect
-from globals import resource_manager, particle_effects
+from globals import resource_manager, particle_effects, added_level_objects
+from objects.coin import Coin
 
-class Asteroid(util.DynamicCollisionCircle):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2, mass: float):
-        super().__init__(position, radius, velocity, mass)
-        self.image_name = 'asteroid'
+
+class Asteroid(util.LevelObject):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, sprite: Surface=None):
+        if sprite is None:
+            sprite = resource_manager.get_image('asteroid')
+        super().__init__(position, radius, velocity, sprite)
 
         self.destroyed = False
         self.health = math.floor(1.25 * math.sqrt(radius))
         self.shake_cooldown = 0.0
     
 
+    def destroy(self):
+        global resource_manager, particle_effects
+        self.destroyed = True
+        sprites = resource_manager.get_full_spritesheet('fragments')
+        particle_count = math.floor(8 * math.sqrt(self.radius) + 3)
+        effect = ParticleEffect(particle_count, self.position, 0, 360, 0, 200, 3.5, 1, 2, 0.2, sprites)
+        particle_effects.append(effect)
+        resource_manager.get_sound('explosion').play()
+
+
     def damage(self):
         self.health -= 1
         if self.health <= 0:
-            self.destroyed = True
-            sprites = resource_manager.get_full_spritesheet('fragments')
-            particle_count = math.floor(8 * math.sqrt(self.radius) + 3)
-            effect = ParticleEffect(particle_count, self.position, 0, 360, 0, 200, 3.5, 1, 2, 0.2, sprites)
-            particle_effects.append(effect)
-            resource_manager.get_sound('explosion').play()
+            self.destroy()
         else:
             resource_manager.get_sound('hit').play()
             self.shake_cooldown = 0.1
 
     
-    def update(self, delta: float):
+    def update(self, delta: float) -> bool:
         super().update(delta)
         self.shake_cooldown = util.move_toward(self.shake_cooldown, 0, delta)
         return self.destroyed
 
 
     def draw(self, surf: Surface, view_pos: Vector2):
-        asteroid_sprite = resource_manager.get_image(self.image_name)
-
-        scaled_sprite_size = self.radius * 2 * util.RENDER_SCALE
-        scaled_sprite_size_vec = Vector2(scaled_sprite_size, scaled_sprite_size)
-        scaled_asteroid_sprite = pygame.transform.scale(asteroid_sprite, Vector2(scaled_sprite_size, scaled_sprite_size))
-
-        screen_coord = self.get_screen_coord(surf, view_pos)
+        offset = Vector2(0, 0)
         if self.shake_cooldown > 0:
-            screen_coord += Vector2(random.randint(-1, 1), random.randint(-1, 1))
-        surf.blit(scaled_asteroid_sprite, screen_coord - scaled_sprite_size_vec / 2.0)
-        # super().draw(surf, view_pos)  # draw debug hitbox
+            offset = Vector2(random.randint(-1, 1), random.randint(-1, 1))
+        super().draw(surf, view_pos, offset)
     
 
-class DestructibleAsteroid(Asteroid):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2, mass: float):
-        super().__init__(position, radius, velocity, mass)
-        self.image_name = 'dest_asteroid'
+class CoinAsteroid(Asteroid):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2):
+        coin_asteroid_sprite = resource_manager.get_image('dest_asteroid')
+        super().__init__(position, radius, velocity, coin_asteroid_sprite)
+    
+
+    def destroy(self):
+        global added_level_objects
+        super().destroy()
+        coin = Coin(self.position)
+        added_level_objects.append(coin)
+
