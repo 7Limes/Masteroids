@@ -6,6 +6,7 @@ pygame.mixer.init()
 from player import Player
 from resource_manager import ResourceManager
 from hazards.asteroid import Asteroid
+import level_path
 
 
 def load_resources(resource_manager: ResourceManager):
@@ -33,6 +34,8 @@ def main():
         Asteroid(pygame.Vector2(15, -10), 4, pygame.Vector2(-2, 1))
     ]
 
+    path = level_path.generate_path(pygame.Vector2(0, 0), pygame.Vector2(-100, -100), 5, 45, 5)
+
     delta: float = 0.0
     run = True
     while run:
@@ -52,6 +55,8 @@ def main():
         for a in asteroids:
             a.update(delta)
             a.draw(win, player.position, resource_manager)
+        
+        level_path.draw_path(win, player.position, path)
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
