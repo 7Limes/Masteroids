@@ -1,4 +1,5 @@
 import random
+import math
 import pygame
 from pygame import Vector2, Surface
 import util
@@ -42,7 +43,9 @@ def generate_level() -> tuple[list[Vector2], list[util.CollisionCircle]]:
         for i in range(random.randrange(7, 15)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
             obj_position = obj_line_position + (perp_vector * random.uniform(-40, 40))
-            obj = Asteroid(obj_position, random.randint(4, 12) / 2.0, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
+            ast_size = random.randint(4, 12) / 2.0
+            obj = Asteroid(obj_position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
+            print(obj.mass)
             level_objects.append(obj)
 
     return (path_points, level_objects)

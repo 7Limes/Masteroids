@@ -49,7 +49,7 @@ def main():
         keys = pygame.key.get_pressed()
 
         player.handle_input(delta, keys)
-        player.update(delta)
+        player.update(delta, level_objects)
 
         for obj in level_objects:
             obj.update(delta)

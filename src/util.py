@@ -4,6 +4,8 @@ from pygame import Vector2, Surface
 
 RENDER_SCALE = 10
 
+GRAVITATIONAL_CONSTANT = 0.002
+
 
 def draw_circle_alpha(surf: Surface, color: tuple[int, int, int], alpha: int, center: Vector2, radius: int):
     radius_vec = Vector2(radius, radius)
@@ -15,7 +17,7 @@ def draw_circle_alpha(surf: Surface, color: tuple[int, int, int], alpha: int, ce
 
 class CollisionCircle:
     def __init__(self, position: Vector2, radius: float):
-        self.position = position
+        self.position = Vector2(position)
         self.radius = radius
     
 
@@ -33,15 +35,21 @@ class CollisionCircle:
         )
 
 
+    def get_screen_coord(self, surf: Surface, view_pos: Vector2):
+        return world_to_screen(surf, view_pos, self.position, RENDER_SCALE)
+
+
     # Debug draw function
-    def draw(self, surf: Surface, position: Vector2):
-        draw_circle_alpha(surf, (0, 255, 0), 64, position, self.radius * RENDER_SCALE)
+    def draw(self, surf: Surface, view_pos: Vector2):
+        screen_coord = self.get_screen_coord(surf, view_pos)
+        draw_circle_alpha(surf, (0, 255, 0), 64, screen_coord, self.radius * RENDER_SCALE)
 
 
 class DynamicCollisionCircle(CollisionCircle):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, mass: float):
         super().__init__(position, radius)
-        self.velocity = velocity
+        self.velocity = Vector2(velocity)
+        self.mass = mass
     
 
     def update(self, delta: float):

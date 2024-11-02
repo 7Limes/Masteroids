@@ -7,15 +7,46 @@ from util import DynamicCollisionCircle
 
 ROTATE_SPEED = 180.0
 THRUST_STRENGTH = 25.0
-MAX_SPEED = 25.0
-BRAKE_STRENGTH = 0.45
+MAX_SPEED = 30.0
+BRAKE_STRENGTH = 0.55
 COLLISION_RADIUS = 1.25
+MASS = 1.0
+
+BULLET_RADIUS = 0.2
+BULLET_MASS = 0.25
+BULLET_SPEED = 20.0
+SHOOT_COOLDOWN = 0.5
+BULLET_LIFETIME = 3.0
+
+
+class PlayerBullet(DynamicCollisionCircle):
+    def __init__(self, position: Vector2, velocity: Vector2):
+        super().__init__(position, BULLET_RADIUS, velocity, BULLET_MASS)
+        self.lifetime = BULLET_LIFETIME
+    
+    def update(self, delta: float) -> bool:
+        super().update(delta)
+        self.lifetime -= delta
+        return self.lifetime <= 0
+    
+    def draw(self, surf: Surface, view_pos: Vector2):
+        screen_coord = self.get_screen_coord(surf, view_pos)
+        pygame.draw.circle(surf, (0, 0, 255), screen_coord, self.radius * util.RENDER_SCALE)
+
 
 
 class Player(DynamicCollisionCircle):
     def __init__(self):
-        super().__init__(Vector2(0, 0), COLLISION_RADIUS, Vector2(0, 0))
+        super().__init__(Vector2(0, 0), COLLISION_RADIUS, Vector2(0, 0), MASS)
         self.angle: float = 0.0
+
+        self.bullets: list[PlayerBullet] = []
+    
+
+    def get_forward_vector(self):
+        vec = Vector2.from_polar((1, self.angle))
+        vec.y *= -1
+        return vec
 
     
     def handle_input(self, delta: float, keys: pygame.key.ScancodeWrapper):
@@ -27,14 +58,32 @@ class Player(DynamicCollisionCircle):
         
         # thrust
         if keys[pygame.K_UP]:
-            thrust_vector: Vector2 = Vector2.from_polar((1, self.angle)) * THRUST_STRENGTH
-            thrust_vector.y *= -1
+            thrust_vector: Vector2 = self.get_forward_vector() * THRUST_STRENGTH
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
          
         # braking
         if keys[pygame.K_SPACE]:
             self.velocity.move_towards_ip(Vector2(0, 0), BRAKE_STRENGTH)
+        
+        # shoot
+        if keys[pygame.K_x]:
+            bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
+            bullet = PlayerBullet(self.position, bullet_velocity)
+            self.bullets.append(bullet)
+    
+
+    def update(self, delta: float, level_objects: list[util.CollisionCircle]):
+        for obj in level_objects:
+            dist_squared = self.position.distance_squared_to(obj.position)
+            gravity_accel = util.GRAVITATIONAL_CONSTANT * (self.mass * obj.mass / dist_squared)
+            gravity_vector = (obj.position - self.position) * gravity_accel
+            self.velocity += gravity_vector
+        
+        super().update(delta)
+        
+        self.bullets = [b for b in self.bullets if not b.update(delta)]
+
 
     
     def draw(self, surf: Surface, resource_manager: ResourceManager):
@@ -45,3 +94,6 @@ class Player(DynamicCollisionCircle):
         surf.blit(player_sprite_rotated, surf_center-half_sprite_size)
 
         super().draw(surf, surf_center)  # draw collision
+
+        for bullet in self.bullets:
+            bullet.draw(surf, self.position)
