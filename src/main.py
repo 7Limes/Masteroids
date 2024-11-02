@@ -1,5 +1,4 @@
 import pygame
-
 pygame.init()
 pygame.mixer.init()
 
@@ -7,9 +6,9 @@ from player import Player
 import level_gen
 import util
 from util import CollisionCircle
-
 import globals
 from globals import particle_effects, added_level_objects
+from objects.coin import Coin
 
 
 def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
@@ -48,7 +47,11 @@ def main():
         player.update(delta, level_objects)
 
         for obj in level_objects:
-            obj.update(delta)
+            if isinstance(obj, Coin):
+                obj.update(delta, player.position)
+            else:
+                obj.update(delta)
+        
         level_objects = [o for o in level_objects if not o.queue_delete]
         level_objects.extend(added_level_objects)
         added_level_objects.clear()
@@ -67,9 +70,8 @@ def main():
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
-        draw_debug_label(win, font, f'vel: {player.velocity}', (0, 40))
-        draw_debug_label(win, font, f'angle: {player.angle:.1f}', (0, 60))
-        draw_debug_label(win, font, f'drawn objs: {len(rendered_objects)}', (0, 80))
+        draw_debug_label(win, font, f'drawn objs: {len(rendered_objects)}', (0, 40))
+        draw_debug_label(win, font, f'coins: {player.coins}', (0, 60))
 
 
         delta = clock.tick(60) / 1000.0

@@ -60,6 +60,10 @@ class CoinAsteroid(Asteroid):
     def destroy(self):
         global added_level_objects
         super().destroy()
-        coin = Coin(self.position)
-        added_level_objects.append(coin)
+        amount_coins = math.floor(2 * math.sqrt(self.radius) + random.randint(-1, 1))
+        for _ in range(amount_coins):
+            coin_position: Vector2 = self.position + Vector2.from_polar((random.uniform(0, self.radius), random.uniform(0, 360)))
+            coin_velocity = (coin_position - self.position).normalize() * 15
+            coin = Coin(coin_position, coin_velocity)
+            added_level_objects.append(coin)
 

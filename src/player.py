@@ -25,7 +25,7 @@ class PlayerBullet(DynamicCollisionCircle):
         super().__init__(position, BULLET_RADIUS, velocity)
         self.lifetime = BULLET_LIFETIME
     
-    def update(self, delta: float, level_objects: list[util.CollisionCircle]) -> bool:
+    def update(self, delta: float, level_objects: list[util.LevelObject]) -> bool:
         super().update(delta)
         for obj in level_objects:
             if not self.hits(obj):
@@ -50,6 +50,8 @@ class Player(DynamicCollisionCircle):
 
         self.bullets: list[PlayerBullet] = []
         self.shoot_cooldown = 0.0
+
+        self.coins: int = 0
     
 
     def get_forward_vector(self):
@@ -84,13 +86,15 @@ class Player(DynamicCollisionCircle):
             resource_manager.get_sound('shoot').play()
     
 
-    def update(self, delta: float, level_objects: list[util.CollisionCircle]):
+    def update(self, delta: float, level_objects: list[util.LevelObject]):
         super().update(delta)
         for obj in level_objects:
             if not self.hits(obj):
                 continue
             if isinstance(obj, Coin):
+                resource_manager.get_sound('coin').play()
                 obj.queue_delete = True
+                self.coins += 1
         
         self.bullets = [b for b in self.bullets if not b.update(delta, level_objects)]
         self.shoot_cooldown = util.move_toward(self.shoot_cooldown, 0, delta)
