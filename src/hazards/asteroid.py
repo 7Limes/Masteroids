@@ -17,5 +17,5 @@ class Asteroid(util.DynamicCollisionCircle):
         scaled_asteroid_sprite = pygame.transform.scale(asteroid_sprite, Vector2(scaled_sprite_size, scaled_sprite_size))
 
         screen_coord = util.world_to_screen(surf, view_pos, self.position, util.RENDER_SCALE)
-        surf.blit(scaled_asteroid_sprite, screen_coord - scaled_sprite_size_vec / 2)
-        super().draw(surf, screen_coord)
+        surf.blit(scaled_asteroid_sprite, screen_coord - scaled_sprite_size_vec / 2.0)
+        super().draw(surf, screen_coord)  # draw debug hitbox

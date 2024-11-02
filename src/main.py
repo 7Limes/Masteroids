@@ -6,7 +6,7 @@ pygame.mixer.init()
 from player import Player
 from resource_manager import ResourceManager
 from hazards.asteroid import Asteroid
-import level_path
+import level_gen
 import util
 from util import CollisionCircle
 
@@ -36,12 +36,8 @@ def main():
     load_resources(resource_manager)
 
     player = Player()
-    level_objects = [
-        Asteroid(pygame.Vector2(20, 20), 5, pygame.Vector2(-1, -0.5)),
-        Asteroid(pygame.Vector2(15, -10), 4, pygame.Vector2(-2, 1))
-    ]
 
-    path = level_path.generate_path(pygame.Vector2(0, 0), pygame.Vector2(-300, -300), 5, 45, 5)
+    path_points, level_objects = level_gen.generate_level()
 
     delta: float = 0.0
     run = True
@@ -65,7 +61,7 @@ def main():
         for obj in rendered_objects:
             obj.draw(win, player.position, resource_manager)
         
-        level_path.draw_path(win, player.position, path)
+        level_gen.draw_path(win, player.position, path_points)
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
