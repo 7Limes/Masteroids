@@ -28,7 +28,7 @@ def main():
 
     player = Player()
     asteroids = [
-        Asteroid(pygame.Vector2(20, 20), 5)
+        Asteroid(pygame.Vector2(20, 20), 5, pygame.Vector2(-1, -0.5))
     ]
 
     delta: float = 0.0
@@ -48,6 +48,7 @@ def main():
 
         player.draw(win, resource_manager)
         for a in asteroids:
+            a.update(delta)
             a.draw(win, player.position)
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))

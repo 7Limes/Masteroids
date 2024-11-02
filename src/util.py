@@ -27,8 +27,17 @@ class CollisionCircle:
     # Debug draw function
     def draw(self, surf: Surface, position: Vector2):
         draw_circle_alpha(surf, (0, 255, 0), 64, position, self.radius * RENDER_SCALE)
-        # pygame.draw.circle(surf, (0, 255, 0, 32), position, self.radius * RENDER_SCALE)
+
+
+class DynamicCollisionCircle(CollisionCircle):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2):
+        super().__init__(position, radius)
+        self.velocity = velocity
     
+
+    def update(self, delta: float):
+        self.position += self.velocity * delta
+
 
 def wrap(x: float, lower: float, upper: float) -> float:
     return lower + (x - lower) % (upper - lower)

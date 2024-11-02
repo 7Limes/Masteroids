@@ -2,7 +2,7 @@ import pygame
 from pygame import Vector2, Surface
 from resource_manager import ResourceManager
 import util
-from util import CollisionCircle
+from util import DynamicCollisionCircle
 
 
 ROTATE_SPEED = 100.0
@@ -11,10 +11,9 @@ MAX_SPEED = 25.0
 COLLISION_RADIUS = 1.25
 
 
-class Player(CollisionCircle):
+class Player(DynamicCollisionCircle):
     def __init__(self):
-        super().__init__(Vector2(0, 0), COLLISION_RADIUS)
-        self.velocity = Vector2(0, 0)
+        super().__init__(Vector2(0, 0), COLLISION_RADIUS, Vector2(0, 0))
         self.angle: float = 0.0
 
     
@@ -30,10 +29,6 @@ class Player(CollisionCircle):
             thrust_vector.y *= -1
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
-    
-
-    def update(self, delta: float):
-        self.position += self.velocity * delta
     
 
     def draw(self, surf: Surface, resource_manager: ResourceManager):

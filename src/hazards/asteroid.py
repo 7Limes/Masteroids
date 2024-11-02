@@ -1,11 +1,11 @@
 from pygame import Vector2, Surface
 import util
-from util import CollisionCircle
+from util import DynamicCollisionCircle
 
 
-class Asteroid(CollisionCircle):
-    def __init__(self, position: Vector2, radius: float):
-        super().__init__(position, radius)
+class Asteroid(DynamicCollisionCircle):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2):
+        super().__init__(position, radius, velocity)
     
 
     def draw(self, surf: Surface, view_pos: Vector2):
