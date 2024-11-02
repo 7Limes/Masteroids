@@ -44,10 +44,12 @@ class DestructibleAsteroid(Asteroid):
 
     def damage(self):
         self.health -= 1
-        self.shake_cooldown = 0.1
         if self.health <= 0:
             self.destroyed = True
-            sprite = Surface((5, 5))
-            sprite.fill((255, 255, 255))
-            effect = ParticleEffect(30, self.position, 0, 360, 5, 1, 2, 0.2, sprite)
+            sprites = resource_manager.get_full_spritesheet('fragments')
+            effect = ParticleEffect(30, self.position, 0, 360, 0, 200, 5, 1, 2, 0.2, sprites)
             particle_effects.append(effect)
+            resource_manager.get_sound('explosion').play()
+        else:
+            resource_manager.get_sound('hit').play()
+            self.shake_cooldown = 0.1

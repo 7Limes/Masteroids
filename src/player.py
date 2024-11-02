@@ -83,6 +83,7 @@ class Player(DynamicCollisionCircle):
             bullet = PlayerBullet(self.position, bullet_velocity)
             self.bullets.append(bullet)
             self.shoot_cooldown = SHOOT_COOLDOWN
+            resource_manager.get_sound('shoot').play()
     
 
     def update(self, delta: float, level_objects: list[util.CollisionCircle]):
