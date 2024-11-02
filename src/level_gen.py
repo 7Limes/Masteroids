@@ -1,9 +1,9 @@
 import random
-import math
 import pygame
 from pygame import Vector2, Surface
 import util
 from objects.asteroid import Asteroid, CoinAsteroid
+from objects.level_end import LevelEnd
 
 
 def generate_path(start: Vector2, end: Vector2, amount_points: int, angle_variance: float, length_variance: float) -> list[Vector2]:
@@ -43,7 +43,9 @@ def generate_level() -> tuple[list[Vector2], list[util.LevelObject]]:
     amount_points = random.randrange(7, 15)
     path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
 
-    level_objects: list[util.LevelObject] = []
+    level_objects: list[util.LevelObject] = [
+        LevelEnd(end_point)
+    ]
     for p1, p2 in zip(path_points[1:], path_points[2:]):
         line_length = p1.distance_to(p2)
         shift_vector = (p2 - p1).normalize()
@@ -53,5 +55,4 @@ def generate_level() -> tuple[list[Vector2], list[util.LevelObject]]:
             obj_position = obj_line_position + (perp_vector * random.uniform(-40, 40))
             obj = generate_asteroid(obj_position)
             level_objects.append(obj)
-
     return (path_points, level_objects)

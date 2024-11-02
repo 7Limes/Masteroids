@@ -14,6 +14,7 @@ def load_resources():
     resource_manager.load_image('asteroid', 'assets/temp-asteroid.png')
     resource_manager.load_image('dest_asteroid', 'assets/temp-dest-asteroid.png')
     resource_manager.load_image('level_end', 'assets/level_end.png')
+    resource_manager.load_spritesheet('level_end_ss', 'assets/level_end_ss.png')
 
     resource_manager.load_spritesheet('fragments', 'assets/fragments.png')
     resource_manager.load_spritesheet('coin', 'assets/coin.png')

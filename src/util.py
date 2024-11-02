@@ -53,6 +53,10 @@ class CollisionCircle:
         dist = self.position.distance_to(other.position)
         return dist <= self.radius + other.radius
     
+
+    def hits_point(self, point: Vector2):
+        return self.position.distance_to(point) <= self.radius
+    
     
     def get_bounding_box(self) -> Rect:
         return Rect(
