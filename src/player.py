@@ -1,17 +1,19 @@
 import pygame
 from pygame import Vector2, Surface
-
 from resource_manager import ResourceManager
 import util
+from util import CollisionCircle
 
 
-ROTATE_SPEED = 100
-THRUST_STRENGTH = 1
-MAX_SPEED = 10
+ROTATE_SPEED = 100.0
+THRUST_STRENGTH = 25.0
+MAX_SPEED = 25.0
+COLLISION_RADIUS = 1.25
 
-class Player:
+
+class Player(CollisionCircle):
     def __init__(self):
-        self.position = Vector2(0, 0)
+        super().__init__(Vector2(0, 0), COLLISION_RADIUS)
         self.velocity = Vector2(0, 0)
         self.angle: float = 0.0
 
@@ -40,3 +42,5 @@ class Player:
         player_sprite_rotated = pygame.transform.rotate(player_sprite, self.angle)
         half_sprite_size = Vector2(player_sprite_rotated.get_size()) / 2
         surf.blit(player_sprite_rotated, surf_center-half_sprite_size)
+
+        super().draw(surf, surf_center)  # draw collision

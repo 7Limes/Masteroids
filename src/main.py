@@ -5,6 +5,7 @@ pygame.mixer.init()
 
 from player import Player
 from resource_manager import ResourceManager
+from hazards.asteroid import Asteroid
 
 
 def load_resources(resource_manager: ResourceManager):
@@ -16,7 +17,7 @@ def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, po
 
 
 def main():
-    win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE)
+    win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
     pygame.display.set_caption('asteroids game')
     clock = pygame.time.Clock()
 
@@ -25,11 +26,12 @@ def main():
     resource_manager = ResourceManager()
     load_resources(resource_manager)
 
-
     player = Player()
+    asteroids = [
+        Asteroid(pygame.Vector2(20, 20), 5)
+    ]
 
     delta: float = 0.0
-
     run = True
     while run:
         for event in pygame.event.get():
@@ -45,6 +47,8 @@ def main():
         win.fill((0, 0, 0))
 
         player.draw(win, resource_manager)
+        for a in asteroids:
+            a.draw(win, player.position)
 
         draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
         draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
