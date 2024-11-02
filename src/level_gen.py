@@ -1,10 +1,17 @@
 import random
 import math
+from typing import Union
 import pygame
 from pygame import Vector2, Surface
 import util
+from hazards.asteroid import Asteroid, DestructibleAsteroid
 
-from hazards.asteroid import Asteroid
+
+LevelObject = Union[
+    Asteroid,
+    DestructibleAsteroid
+]
+
 
 def generate_path(start: Vector2, end: Vector2, amount_points: int, angle_variance: float, length_variance: float) -> list[Vector2]:
     points: list[Vector2] = [start]
@@ -29,6 +36,14 @@ def draw_path(surf: Surface, view_pos: Vector2, points: list[Vector2]):
         util.draw_circle_alpha(surf, (128, 128, 128), 128, screen_coordinate, 5)
 
 
+def generate_asteroid(position: Vector2):
+    ast_size = random.randint(4, 12) / 2.0
+    if random.randrange(0, 5) == 0:
+        return DestructibleAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
+    return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
+
+
+
 # Creates a path and populates it with objects.
 def generate_level() -> tuple[list[Vector2], list[util.CollisionCircle]]:
     end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
@@ -43,9 +58,7 @@ def generate_level() -> tuple[list[Vector2], list[util.CollisionCircle]]:
         for i in range(random.randrange(7, 15)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
             obj_position = obj_line_position + (perp_vector * random.uniform(-40, 40))
-            ast_size = random.randint(4, 12) / 2.0
-            obj = Asteroid(obj_position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), math.pi*ast_size**2)
-            print(obj.mass)
+            obj = generate_asteroid(obj_position)
             level_objects.append(obj)
 
     return (path_points, level_objects)

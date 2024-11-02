@@ -4,16 +4,12 @@ pygame.init()
 pygame.mixer.init()
 
 from player import Player
-from resource_manager import ResourceManager
-from hazards.asteroid import Asteroid
 import level_gen
 import util
 from util import CollisionCircle
 
-
-def load_resources(resource_manager: ResourceManager):
-    resource_manager.load_image('player', 'assets/temp-player.png')
-    resource_manager.load_image('asteroid', 'assets/temp-asteroid.png')
+import globals
+from globals import particle_effects
 
 
 def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
@@ -32,8 +28,7 @@ def main():
 
     font = pygame.font.SysFont('Arial', 15)
 
-    resource_manager = ResourceManager()
-    load_resources(resource_manager)
+    globals.load_resources()
 
     player = Player()
 
@@ -51,15 +46,17 @@ def main():
         player.handle_input(delta, keys)
         player.update(delta, level_objects)
 
-        for obj in level_objects:
-            obj.update(delta)
+        level_objects = [o for o in level_objects if not o.update(delta)]
 
         win.fill((0, 0, 0))
 
-        player.draw(win, resource_manager)
+        for effect in particle_effects:
+            effect.tickdraw(delta, win, player.position)
+
+        player.draw(win)
         rendered_objects = get_rendered_objects(win, player.position, level_objects)
         for obj in rendered_objects:
-            obj.draw(win, player.position, resource_manager)
+            obj.draw(win, player.position)
         
         level_gen.draw_path(win, player.position, path_points)
 

@@ -54,10 +54,17 @@ class DynamicCollisionCircle(CollisionCircle):
 
     def update(self, delta: float):
         self.position += self.velocity * delta
+        return False
 
 
 def wrap(x: float, lower: float, upper: float) -> float:
     return lower + (x - lower) % (upper - lower)
+
+
+def move_toward(current: float, target: float, delta: float) -> float:
+    direction = (target - current) > 0
+    adjustment = min(abs(target - current), delta)
+    return current + adjustment if direction else current - adjustment
 
 
 def world_to_screen(surf: Surface, view_pos: Vector2, point: Vector2, scale) -> Vector2:

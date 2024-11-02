@@ -3,6 +3,9 @@ from pygame import Vector2, Surface
 from resource_manager import ResourceManager
 import util
 from util import DynamicCollisionCircle
+from hazards.asteroid import DestructibleAsteroid
+from level_gen import LevelObject
+from globals import resource_manager
 
 
 ROTATE_SPEED = 180.0
@@ -24,8 +27,15 @@ class PlayerBullet(DynamicCollisionCircle):
         super().__init__(position, BULLET_RADIUS, velocity, BULLET_MASS)
         self.lifetime = BULLET_LIFETIME
     
-    def update(self, delta: float) -> bool:
+    def update(self, delta: float, level_objects: list[LevelObject]) -> bool:
         super().update(delta)
+        for obj in level_objects:
+            if not self.hits(obj):
+                continue
+            if isinstance(obj, DestructibleAsteroid):
+                obj.damage()
+            return True
+                
         self.lifetime -= delta
         return self.lifetime <= 0
     
@@ -41,6 +51,7 @@ class Player(DynamicCollisionCircle):
         self.angle: float = 0.0
 
         self.bullets: list[PlayerBullet] = []
+        self.shoot_cooldown = 0.0
     
 
     def get_forward_vector(self):
@@ -67,10 +78,11 @@ class Player(DynamicCollisionCircle):
             self.velocity.move_towards_ip(Vector2(0, 0), BRAKE_STRENGTH)
         
         # shoot
-        if keys[pygame.K_x]:
+        if keys[pygame.K_x] and self.shoot_cooldown == 0:
             bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
             bullet = PlayerBullet(self.position, bullet_velocity)
             self.bullets.append(bullet)
+            self.shoot_cooldown = SHOOT_COOLDOWN
     
 
     def update(self, delta: float, level_objects: list[util.CollisionCircle]):
@@ -82,18 +94,19 @@ class Player(DynamicCollisionCircle):
         
         super().update(delta)
         
-        self.bullets = [b for b in self.bullets if not b.update(delta)]
+        self.bullets = [b for b in self.bullets if not b.update(delta, level_objects)]
+        self.shoot_cooldown = util.move_toward(self.shoot_cooldown, 0, delta)
 
 
     
-    def draw(self, surf: Surface, resource_manager: ResourceManager):
+    def draw(self, surf: Surface):
         surf_center = Vector2(surf.get_size()) / 2
         player_sprite = resource_manager.get_image('player')
         player_sprite_rotated = pygame.transform.rotate(player_sprite, self.angle)
         half_sprite_size = Vector2(player_sprite_rotated.get_size()) / 2
         surf.blit(player_sprite_rotated, surf_center-half_sprite_size)
 
-        super().draw(surf, surf_center)  # draw collision
+        super().draw(surf, self.position)  # draw collision
 
         for bullet in self.bullets:
             bullet.draw(surf, self.position)
