@@ -4,7 +4,7 @@ from typing import Union
 import pygame
 from pygame import Vector2, Surface
 import util
-from hazards.asteroid import Asteroid, DestructibleAsteroid
+from objects.asteroid import Asteroid, DestructibleAsteroid
 
 
 LevelObject = Union[

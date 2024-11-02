@@ -1,9 +1,9 @@
 import pygame
 from pygame import Vector2, Surface
-from resource_manager import ResourceManager
+
 import util
 from util import DynamicCollisionCircle
-from hazards.asteroid import DestructibleAsteroid
+from objects.asteroid import Asteroid
 from level_gen import LevelObject
 from globals import resource_manager
 
@@ -32,7 +32,7 @@ class PlayerBullet(DynamicCollisionCircle):
         for obj in level_objects:
             if not self.hits(obj):
                 continue
-            if isinstance(obj, DestructibleAsteroid):
+            if isinstance(obj, Asteroid):
                 obj.damage()
             return True
                 
