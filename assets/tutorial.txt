@@ -1,0 +1,29 @@
+==========================
+ MASTEROIDS - How to Play
+==========================
+
+I don't have time to make an actual tutorial so you're getting a tk.ScrolledText instead. Hope you like monospace!
+
+This is an Asteroids-style roguelike, so just try and make it as far as you can.
+Collect coins by destroying gold asteroids and enemy ships.
+Use these coins to purchase upgrades for your ship.
+
+You can upgrade your ship when you get to the safe zone at the end of a path.
+
+By the way, if you take one hit, you're dead.
+
+
+-= Controls =-
+Mouse - Aim ship
+LMB   - Shoot
+RMB   - Hook
+W     - Thrust
+S     - Brake
+
+
+-= Hook =-
+Your hook enables you to latch onto asteroids and swing around them.
+Point at an astroid and hold Right Click to hook onto it.
+
+
+That's basically all there is to it! Have fun!

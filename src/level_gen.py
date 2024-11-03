@@ -4,7 +4,7 @@ import pygame
 from pygame import Vector2, Surface
 import util
 from objects.asteroid import Asteroid, CoinAsteroid
-from objects.enemy import Orbiter, SmartOrbiter
+from objects.enemy import Orbiter, SmartOrbiter, LongRangeOrbiter, Enemy
 from objects.level_end import LevelEnd
 
 
@@ -38,25 +38,34 @@ def generate_asteroid(position: Vector2) -> Asteroid:
     return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), random.uniform(-10, 10))
 
 
+def generate_orbiter(position: Vector2, difficulty: float) -> Enemy:
+    if difficulty < 3:
+        return Orbiter(position)
+    if difficulty < 6:
+        if random.randrange(0, 10) < 4:
+            return SmartOrbiter(position)
+        return Orbiter(position)
+    r = random.randrange(0, 10)
+    if r < 5:
+        return Orbiter(position)
+    if r < 8:
+        return SmartOrbiter(position)
+    return LongRangeOrbiter(position)
+
+
 def generate_object(position: Vector2, difficulty: float) -> util.LevelObject:
     orbiter_chance = -4*difficulty+90 if difficulty < 10 else 50
     r = random.randrange(0, 100)
     if r < orbiter_chance:
         return generate_asteroid(position)
-    return SmartOrbiter(position)
-
-
-def max_object_distance(difficulty: int):
-    if difficulty < 10:
-        return math.floor(-10 * math.sqrt(difficulty) + 55)
-    return 1 / (difficulty-9) + 22.38
+    return generate_orbiter(position, difficulty)
 
 
 # Creates a path and populates it with objects.
 def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObject]]:
     amount_points = math.floor(0.5*difficulty + 8) if difficulty < 14 else 15
     average_amount_objects = math.floor(4 * math.sqrt(difficulty))
-    object_distance = max_object_distance(difficulty)
+    object_distance = 50
 
     end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
     amount_points += random.randrange(-1, 1)
@@ -73,7 +82,7 @@ def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObjec
         for i in range(average_amount_objects + random.randint(-1, 1)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
             obj_position = obj_line_position + (perp_vector * random.uniform(-object_distance, object_distance))
-            if obj_position.distance_to((0, 0)) < 10:
+            if obj_position.distance_to((0, 0)) < 30:
                 continue
             obj = generate_object(obj_position, difficulty)
             level_objects.append(obj)

@@ -181,6 +181,7 @@ class Player(DynamicCollisionCircle):
                 obj.queue_delete = True
                 self.coins += 1
             elif isinstance(obj, LevelEnd):
+                resource_manager.get_sound('end_level').play()
                 state.switch_to_upgrade(self)
             else:
                 self.bullets.clear()
@@ -200,13 +201,16 @@ class Player(DynamicCollisionCircle):
         self.shoot_cooldown = util.move_toward(self.shoot_cooldown, 0, delta)
     
 
+    def reset_objects(self):
+        self.bullets.clear()
+        self.selected_object = None
+        self.hooked_object = None
+
+
     def reset_position(self):
         self.position = Vector2(0, 0)
         self.velocity = Vector2(0, 0)
         self.angle = 0.0
-        self.bullets.clear
-        self.selected_object = None
-        self.hooked_object = None
     
 
     def full_reset(self):

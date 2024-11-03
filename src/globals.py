@@ -51,8 +51,8 @@ def set_game_state(state: GameState):
 def load_resources():
     global resource_manager
     resource_manager.load_image('player', f'{ASSETS_PATH}/player.png')
-    resource_manager.load_image('asteroid', f'{ASSETS_PATH}/temp-asteroid.png')
-    resource_manager.load_image('dest_asteroid', f'{ASSETS_PATH}/temp-dest-asteroid.png')
+    resource_manager.load_image('asteroid', f'{ASSETS_PATH}/asteroid.png')
+    resource_manager.load_image('coin_asteroid', f'{ASSETS_PATH}/coin_asteroid.png')
     resource_manager.load_image('orbiter', f'{ASSETS_PATH}/orbiter.png')
     resource_manager.load_image('smart_orbiter', f'{ASSETS_PATH}/smart_orbiter.png')
     resource_manager.load_image('long_orbiter', f'{ASSETS_PATH}/long_orbiter.png')
@@ -79,3 +79,4 @@ def load_resources():
     resource_manager.load_sound('death', f'{ASSETS_PATH}/audio/death.wav')
     resource_manager.load_sound('deltarune_explosion', f'{ASSETS_PATH}/audio/deltarune_explosion.mp3')
     resource_manager.load_sound('upgrade', f'{ASSETS_PATH}/audio/upgrade.wav')
+    resource_manager.load_sound('end_level', f'{ASSETS_PATH}/audio/end_level.wav')

@@ -3,7 +3,7 @@ from pygame import Vector2
 from globals import resource_manager, ui_handler, particle_effects, added_level_objects
 from ui.ui import UpgradeBox, LabelButton
 from level_gen import level_manager
-
+from tutorial import open_tutorial_window
 
 UPGRADE_BOX_SIZE = Vector2(500, 100)
 MAX_UPGRADE_LEVEL = 4
@@ -15,17 +15,20 @@ def initialize_main_menu(player):
 
     def start_callback():
         switch_to_level(player)
+    def tutorial_callback():
+        open_tutorial_window()
 
     start_button = LabelButton(Vector2(100, 100), Vector2(400, 80), start_callback, 'Start')
-    ui_handler.elements.append(start_button)
+    tutorial_button = LabelButton(Vector2(100, 100), Vector2(400, 80), tutorial_callback, 'How to Play')
+    ui_handler.elements.extend([start_button, tutorial_button])
 
 
 def calculate_upgrade_cost(level: int) -> int:
-    return int(2.5 * (level+1.5)**2 + 14.375)
+    return 5*level**2 + 15*level + 25
 
 
 def purchase_logic(player, upgrade_id: str, upgrade_box: UpgradeBox):
-    if player.coins > upgrade_box.cost and player.upgrades[upgrade_id] < MAX_UPGRADE_LEVEL:
+    if player.coins >= upgrade_box.cost and player.upgrades[upgrade_id] < MAX_UPGRADE_LEVEL:
         player.coins -= upgrade_box.cost
         player.upgrades[upgrade_id] += 1
         upgrade_box.cost = calculate_upgrade_cost(player.upgrades[upgrade_id])
@@ -84,7 +87,7 @@ def switch_to_upgrade(player):
 
 def switch_to_game_over(player):
     resource_manager.get_sound('death').play()
-    player.full_reset()
+    player.reset_objects()
     game_state.set_state(GameStateEnum.GAME_OVER)
 
 

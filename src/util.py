@@ -120,24 +120,45 @@ def get_viewport_rect(surf: Surface, view_pos: Vector2) -> Rect:
     return viewport.move(view_pos - half_viewport_size)
 
 
-def closest_segment_distance(point: Vector2, points: list[Vector2]) -> float:
-    min_distance = float('inf')
-
-    for i in range(len(points) - 1):
-        distance = point_to_segment_distance(point, points[i], points[i + 1])
-        min_distance = min(min_distance, distance)
+def closest_segment_point_distance(point: Vector2, points: list[Vector2]) -> tuple[float, Vector2]:
+    if len(points) < 2:
+        raise ValueError("Need at least 2 points to form a line segment")
         
-    return min_distance
+    min_distance = float('inf')
+    closest_point = None
+    
+    # Check each line segment formed by consecutive points
+    for i in range(len(points) - 1):
+        distance, segment_point = point_to_segment_distance(point, points[i], points[i + 1])
+        if distance < min_distance:
+            min_distance = distance
+            closest_point = segment_point
+        
+    return min_distance, closest_point
 
-def point_to_segment_distance(point: Vector2, segment_start: Vector2, segment_end: Vector2) -> float:
+def point_to_segment_distance(point: Vector2, segment_start: Vector2, segment_end: Vector2) -> tuple[float, Vector2]:
+    # Vector from segment start to end
     segment = segment_end - segment_start
+    
+    # If segment has zero length, return distance to either endpoint
     if segment.length() == 0:
-        return (point - segment_start).length()
+        return (point - segment_start).length(), Vector2(segment_start)
+    
+    # Vector from segment start to point
     point_vector = point - segment_start
+    
+    # Calculate normalized projection of point onto segment
     t = point_vector.dot(segment) / segment.dot(segment)
+    
+    # Clamp t to [0,1] to handle points beyond segment endpoints
     t = max(0, min(1, t))
+    
+    # Calculate the closest point on segment
     closest = segment_start + segment * t
-    return (point - closest).length()
+    
+    # Return distance and closest point
+    return (point - closest).length(), closest
+
 
 
 class LevelObject(DynamicCollisionCircle):

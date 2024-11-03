@@ -12,11 +12,12 @@ from resource_manager import AnimationManager
 from objects.coin import Coin
 from objects.enemy import Enemy
 import state
+from stars import StarfieldBackground
 
 
 MAX_DISTANCE_FROM_PATH = 60.0
 DANGER_OVERLAY_DISTANCE = 30.0
-
+OUT_OF_BOUNDS_FORCE_STRENGTH = 5.0
 
 def draw_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
     surf.blit(font.render(text, True, (255, 255, 255)), position)
@@ -61,6 +62,7 @@ class GameOverHandler:
             self.draw_game_over = True
         if self.timer > 8:
             self.reset()
+            player.full_reset()
             state.switch_to_menu(player)
     
     def reset(self):
@@ -70,7 +72,7 @@ class GameOverHandler:
 def menu_update(win: pygame.Surface, font: pygame.font.Font):
     util.tile_surface(win, resource_manager.get_image('menu_bg'), 5)
     title_label = font.render('Masteroids', True, (255, 255, 255))
-    title_label_pos = pygame.Vector2(win.get_size()) / 2 - pygame.Vector2(title_label.get_size()) / 2
+    title_label_pos = pygame.Vector2(win.get_size()) / 2 - pygame.Vector2(title_label.get_size()) / 2 + pygame.Vector2(0, -200)
     win.blit(title_label, title_label_pos)
 
     prev_selected_element = ui_handler.selected_element
@@ -82,7 +84,7 @@ def menu_update(win: pygame.Surface, font: pygame.font.Font):
 
 
 def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, player: Player, keys: pygame.key.ScancodeWrapper, 
-                 level_objects: list[util.LevelObject], path_points: list[pygame.Vector2]):
+                 level_objects: list[util.LevelObject], path_points: list[pygame.Vector2], stars_background: StarfieldBackground):
     player.handle_input(pygame.Vector2(win.get_size()), delta, keys)
     player.update(delta, level_objects)
 
@@ -97,12 +99,22 @@ def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, play
     added_level_objects.clear()
 
     # check if player is too far from path
-    path_distance = util.closest_segment_distance(player.position, path_points)
+    path_distance, path_point = util.closest_segment_point_distance(player.position, path_points)
     if path_distance > MAX_DISTANCE_FROM_PATH:
-        state.switch_to_game_over(player)
+        force_vec = (path_point - player.position).normalize() * (path_distance-MAX_DISTANCE_FROM_PATH) * OUT_OF_BOUNDS_FORCE_STRENGTH
+        player.velocity += force_vec * delta
 
     win.fill((0, 0, 0))
 
+    stars_background.update(player.position)
+    stars_background.draw(win)
+
+    if path_distance > DANGER_OVERLAY_DISTANCE:
+        overlay_alpha = min(util.map_range(path_distance-DANGER_OVERLAY_DISTANCE, 0, MAX_DISTANCE_FROM_PATH-DANGER_OVERLAY_DISTANCE, 0, 255), 255)
+        overlay = pygame.Surface(win.get_size(), pygame.SRCALPHA)
+        overlay.fill((5, 5, 15, overlay_alpha))
+        win.blit(overlay, (0, 0))
+    
     draw_path(win, player.position, path_points)
 
     for effect in particle_effects:
@@ -114,11 +126,6 @@ def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, play
         obj.draw(win, player.position)
     player.draw(win)
 
-    if path_distance > DANGER_OVERLAY_DISTANCE:
-        overlay_alpha = min(util.map_range(path_distance-DANGER_OVERLAY_DISTANCE, 0, MAX_DISTANCE_FROM_PATH-DANGER_OVERLAY_DISTANCE, 0, 255), 255)
-        overlay = pygame.Surface(win.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, overlay_alpha))
-        win.blit(overlay, (0, 0))
     
     draw_label(win, font, f'Score: {player.score}', (5, 5))
     coin_icon = pygame.transform.scale_by(resource_manager.get_spritesheet_image('coin', 0), 2)
@@ -126,7 +133,7 @@ def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, play
     draw_label(win, font, f'x {player.coins}', (30, 23))
 
 
-def upgrade_update(delta: float, win: pygame.Surface, title_font: pygame.font.Font, font: pygame.font.Font, player: Player):
+def upgrade_update(win: pygame.Surface, title_font: pygame.font.Font, font: pygame.font.Font, player: Player):
     prev_selected_element = ui_handler.selected_element
     ui_handler.update()
     if prev_selected_element is None and ui_handler.selected_element:
@@ -145,7 +152,7 @@ def upgrade_update(delta: float, win: pygame.Surface, title_font: pygame.font.Fo
     draw_label(win, font, f'x {player.coins}', (screen_center_x, 100))
 
 
-def game_over_update(delta: float, win: pygame.Surface, font: pygame.font.Font, player: Player, game_over_handler: GameOverHandler):
+def game_over_update(delta: float, win: pygame.Surface, title_font: pygame.font.Font, font: pygame.font.Font, player: Player, game_over_handler: GameOverHandler):
     player.selected_object = None
     player.hooked_object = None
 
@@ -155,9 +162,16 @@ def game_over_update(delta: float, win: pygame.Surface, font: pygame.font.Font, 
     game_over_handler.tickdraw(delta, win, player)
 
     if game_over_handler.draw_game_over:
-        label = font.render('GAME OVER', True, (255, 255, 255))
-        label_pos = pygame.Vector2(win.get_size()) / 2 - pygame.Vector2(label.get_size()) / 2
+        label = title_font.render('GAME OVER', True, (255, 255, 255))
+        win_half_size = pygame.Vector2(win.get_size()) / 2
+        label_pos = win_half_size - pygame.Vector2(label.get_size()) / 2
+        score_label = font.render(f'Score: {player.score}', True, (255, 255, 255))
+        score_label_pos = win_half_size - pygame.Vector2(score_label.get_size()) / 2 + pygame.Vector2(0, 50)
+        level_label = font.render(f'You made it to level {level_manager.difficulty}', True, (255, 255, 255))
+        level_label_pos = win_half_size - pygame.Vector2(level_label.get_size()) / 2 + pygame.Vector2(0, 80)
         win.blit(label, label_pos)
+        win.blit(score_label, score_label_pos)
+        win.blit(level_label, level_label_pos)
 
 
 def main():
@@ -172,6 +186,8 @@ def main():
     game_over_handler = GameOverHandler()
 
     player = Player()
+
+    stars_background = StarfieldBackground((1280, 720))
     
     state.switch_to_menu(player)
     delta: float = 0.0
@@ -180,6 +196,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.WINDOWRESIZED:
+                stars_background.resize(win.get_size())
         
         keys = pygame.key.get_pressed()
         if game_state.state == GameStateEnum.MENU:
@@ -187,11 +205,11 @@ def main():
         elif game_state.state == GameStateEnum.PAUSE:
             pass
         elif game_state.state == GameStateEnum.LEVEL:
-            level_update(delta, win, font, player, keys, level_manager.level_objects, level_manager.path_points)
+            level_update(delta, win, font, player, keys, level_manager.level_objects, level_manager.path_points, stars_background)
         elif game_state.state == GameStateEnum.UPGRADE:
-            upgrade_update(delta, win, title_font, font, player)
+            upgrade_update(win, title_font, font, player)
         elif game_state.state == GameStateEnum.GAME_OVER:
-            game_over_update(delta, win, title_font, player, game_over_handler)
+            game_over_update(delta, win, title_font, font, player, game_over_handler)
 
         delta = clock.tick(60) / 1000.0
         pygame.display.flip()

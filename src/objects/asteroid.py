@@ -53,7 +53,7 @@ class Asteroid(util.LevelObject):
 
 class CoinAsteroid(Asteroid):
     def __init__(self, position: Vector2, radius: float, velocity: Vector2, angular_velocity: float):
-        coin_asteroid_sprite = resource_manager.get_image('dest_asteroid')
+        coin_asteroid_sprite = resource_manager.get_image('coin_asteroid')
         super().__init__(position, radius, velocity, angular_velocity, coin_asteroid_sprite)
     
 
