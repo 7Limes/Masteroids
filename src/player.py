@@ -6,7 +6,8 @@ import util
 from util import DynamicCollisionCircle
 from objects.asteroid import Asteroid
 from objects.coin import Coin
-from globals import resource_manager
+from globals import resource_manager, particle_effects
+from particle.particle import ParticleEffect
 
 
 ROTATE_SPEED = 180.0
@@ -16,7 +17,7 @@ BRAKE_STRENGTH = 0.55
 COLLISION_RADIUS = 1.25
 
 BULLET_RADIUS = 0.2
-BULLET_SPEED = 20.0
+BULLET_SPEED = 30.0
 SHOOT_COOLDOWN = 0.4
 BULLET_LIFETIME = 3.0
 
@@ -98,9 +99,14 @@ class Player(DynamicCollisionCircle):
         
         # thrust
         if keys[pygame.K_UP]:
-            thrust_vector: Vector2 = self.get_forward_vector() * THRUST_STRENGTH
+            forward = self.get_forward_vector()
+            thrust_vector: Vector2 = forward * THRUST_STRENGTH
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
+
+            effect_position = -forward + self.position
+            effect = ParticleEffect.primitive(5, effect_position, self.angle+180, 20, 0, 0, 7, 1, 0.3, 0.1, 5, 2, (255, 50, 50), (255, 215, 0))
+            particle_effects.append(effect)
          
         # braking
         if keys[pygame.K_DOWN]:
@@ -118,6 +124,7 @@ class Player(DynamicCollisionCircle):
             if self.selected_object is not None and self.hooked_object is None:
                 self.hooked_object = self.selected_object
                 self.hook_distance = self.position.distance_to(self.hooked_object.position)
+                resource_manager.get_sound('hook').play()
         else:
             self.hooked_object = None
     

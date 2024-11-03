@@ -1,22 +1,14 @@
 import pygame
 pygame.init()
 pygame.mixer.init()
-from enum import Enum
 
 from player import Player
 import level_gen
 import util
 from util import CollisionCircle
 import globals
-from globals import particle_effects, added_level_objects
+from globals import particle_effects, added_level_objects, resource_manager, game_state, GameState
 from objects.coin import Coin
-
-
-class GameState(Enum):
-    MENU = 0
-    PAUSE = 1
-    LEVEL = 2
-    UPGRADE = 3
 
 
 def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
@@ -67,7 +59,7 @@ def level_update(delta: float, win: pygame.Surface, player: Player, keys: pygame
 
 
 def upgrade_update(delta: float, win: pygame.Surface, player: Player, keys: pygame.key.ScancodeWrapper):
-    pass
+    util.tile_surface(win, resource_manager.get_image('space_bg'), 3)
 
 
 def main():
@@ -76,8 +68,6 @@ def main():
     pygame.display.set_caption('asteroids game')
     clock = pygame.time.Clock()
     font = pygame.font.SysFont('Arial', 15)
-
-    game_state = GameState.LEVEL
     globals.load_resources()
 
     player = Player()

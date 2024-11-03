@@ -38,7 +38,7 @@ class ParticleEffect:
     def __init__(self, particle_count: int, position: Vector2, angle: float, angle_var: float, 
                  angular_velocity: float, angular_velocity_var: float,
                  emission_strength: float, emission_strength_var: float, duration: float, duration_var: float,
-                 sprite: Surface | list[Surface]):
+                 sprite: Surface | list[Surface], initialize: bool=True):
         self.particles: list[Particle] = []
         self.emission_vector: Vector2 = Vector2.from_polar((emission_strength, angle))
 
@@ -47,12 +47,37 @@ class ParticleEffect:
                 return random.choice(sprite)
             return sprite
 
-        for i in range(particle_count):
-            particle_velocity = self.emission_vector.rotate(random.uniform(-angle_var, angle_var)) * uniform_with_variance(1, emission_strength_var)
+        if initialize:
+            for _ in range(particle_count):
+                particle_velocity = self.emission_vector.rotate(random.uniform(-angle_var, angle_var)) * uniform_with_variance(1, emission_strength_var)
+                particle_angular_velocity = uniform_with_variance(angular_velocity, angular_velocity_var)
+                particle_duration = uniform_with_variance(duration, duration_var)
+                p = Particle(position, particle_velocity, particle_angular_velocity, particle_duration, get_sprite())
+                self.particles.append(p)
+
+
+    @staticmethod
+    def primitive(particle_count: int, position: Vector2, angle: float, angle_var: float, 
+                 angular_velocity: float, angular_velocity_var: float,
+                 emission_strength: float, emission_strength_var: float, duration: float, duration_var: float,
+                 size: int, size_var, color1: tuple[int, int, int], color2: tuple[int, int, int]) -> "ParticleEffect":
+        effect = ParticleEffect(particle_count, position, angle, angle_var, 
+                       angular_velocity, angular_velocity_var, 
+                       emission_strength, emission_strength_var, duration, duration_var, None, initialize=False)
+        for _ in range(particle_count):
+            particle_velocity = effect.emission_vector.rotate(random.uniform(-angle_var, angle_var)) * uniform_with_variance(1, emission_strength_var)
             particle_angular_velocity = uniform_with_variance(angular_velocity, angular_velocity_var)
             particle_duration = uniform_with_variance(duration, duration_var)
-            p = Particle(position, particle_velocity, particle_angular_velocity, particle_duration, get_sprite())
-            self.particles.append(p)
+            particle_size = uniform_with_variance(size, size_var)
+            particle_color = util.interpolate_color(color1, color2, random.uniform(0, 1))
+            sprite = Surface((particle_size, particle_size), pygame.SRCALPHA)
+            sprite.fill(particle_color)
+            p = Particle(position, particle_velocity, particle_angular_velocity, particle_duration, sprite)
+            effect.particles.append(p)
+        return effect
+        
+
+
 
     
     def tickdraw(self, delta: float, surf: Surface, view_pos: Vector2):

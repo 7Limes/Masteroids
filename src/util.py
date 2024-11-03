@@ -1,3 +1,4 @@
+import math
 import pygame
 from pygame import Vector2, Surface
 from resource_manager import AnimationManager
@@ -149,4 +150,32 @@ class AnimatedLevelObject(LevelObject):
         self.sprite = self.animation_manager.get_current_frame()
         super().update(delta)
     
+
+def tile_surface(destination_surf: Surface, source_surf: Surface, tile_scale: float=1.0):
+    if tile_scale != 1.0:
+        source_surf = pygame.transform.scale_by(source_surf, tile_scale)
+    dest_width, dest_height = destination_surf.get_size()
+    source_width, source_height = source_surf.get_size()
+    tiles_x = max(1, math.ceil(dest_width / source_width))
+    tiles_y = max(1, math.ceil(dest_height / source_height))
+    for i in range(tiles_y):
+        for j in range(tiles_x):
+            blit_pos = (j*source_width, i*source_height)
+            destination_surf.blit(source_surf, blit_pos)
+
+
+def interpolate_color(color1: tuple[int, int, int], color2: tuple[int, int, int], t: float) -> tuple[int, int, int]:
+    if not (0 <= t <= 1):
+        raise ValueError("The value of t must be between 0 and 1.")
+
+    def interpolate_channel(c1, c2, t):
+        return int(round(c1 + (c2 - c1) * t))
     
+    r1, g1, b1 = color1
+    r2, g2, b2 = color2
+
+    r = interpolate_channel(r1, r2, t)
+    g = interpolate_channel(g1, g2, t)
+    b = interpolate_channel(b1, b2, t)
+
+    return (r, g, b)
