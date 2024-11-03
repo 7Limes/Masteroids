@@ -13,12 +13,20 @@ You can upgrade your ship when you get to the safe zone at the end of a path.
 By the way, if you take one hit, you're dead.
 
 
--= Controls =-
+-= Mouse Controls =-
 Mouse - Aim ship
 LMB   - Shoot
 RMB   - Hook
 W     - Thrust
 S     - Brake
+
+
+-= Keyboard Controls =-
+Left, Right - Aim ship
+Z           - Shoot
+X           - Hook
+Up          - Thrust
+Down        - Brake
 
 
 -= Hook =-
