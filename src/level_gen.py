@@ -4,7 +4,7 @@ import pygame
 from pygame import Vector2, Surface
 import util
 from objects.asteroid import Asteroid, CoinAsteroid
-from objects.enemy import Orbiter
+from objects.enemy import Orbiter, SmartOrbiter
 from objects.level_end import LevelEnd
 
 
@@ -43,7 +43,7 @@ def generate_object(position: Vector2, difficulty: float) -> util.LevelObject:
     r = random.randrange(0, 100)
     if r < orbiter_chance:
         return generate_asteroid(position)
-    return Orbiter(position)
+    return SmartOrbiter(position)
 
 
 def max_object_distance(difficulty: int):

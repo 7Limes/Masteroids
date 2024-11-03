@@ -6,6 +6,7 @@ from level_gen import level_manager
 
 
 UPGRADE_BOX_SIZE = Vector2(500, 100)
+MAX_UPGRADE_LEVEL = 4
 
 
 def initialize_main_menu(player):
@@ -24,7 +25,7 @@ def calculate_upgrade_cost(level: int) -> int:
 
 
 def purchase_logic(player, upgrade_id: str, upgrade_box: UpgradeBox):
-    if player.coins > upgrade_box.cost:
+    if player.coins > upgrade_box.cost and player.upgrades[upgrade_id] < MAX_UPGRADE_LEVEL:
         player.coins -= upgrade_box.cost
         player.upgrades[upgrade_id] += 1
         upgrade_box.cost = calculate_upgrade_cost(player.upgrades[upgrade_id])

@@ -54,6 +54,9 @@ def load_resources():
     resource_manager.load_image('asteroid', f'{ASSETS_PATH}/temp-asteroid.png')
     resource_manager.load_image('dest_asteroid', f'{ASSETS_PATH}/temp-dest-asteroid.png')
     resource_manager.load_image('orbiter', f'{ASSETS_PATH}/orbiter.png')
+    resource_manager.load_image('smart_orbiter', f'{ASSETS_PATH}/smart_orbiter.png')
+    resource_manager.load_image('long_orbiter', f'{ASSETS_PATH}/long_orbiter.png')
+
     resource_manager.load_image('fire_rate_icon', f'{ASSETS_PATH}/shoot_upgrade.png')
     resource_manager.load_image('brakes_icon', f'{ASSETS_PATH}/brakes_upgrade.png')
     resource_manager.load_image('thrust_icon', f'{ASSETS_PATH}/fire_upgrade.png')

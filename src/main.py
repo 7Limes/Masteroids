@@ -10,12 +10,12 @@ import globals
 from globals import particle_effects, added_level_objects, resource_manager, game_state, GameStateEnum, ui_handler, ASSETS_PATH
 from resource_manager import AnimationManager
 from objects.coin import Coin
-from objects.enemy import Orbiter
+from objects.enemy import Enemy
 import state
 
 
-MAX_DISTANCE_FROM_PATH = 50.0
-DANGER_OVERLAY_DISTANCE = 20.0
+MAX_DISTANCE_FROM_PATH = 60.0
+DANGER_OVERLAY_DISTANCE = 30.0
 
 
 def draw_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
@@ -87,7 +87,7 @@ def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, play
     player.update(delta, level_objects)
 
     for obj in level_objects:
-        if isinstance(obj, (Coin, Orbiter)):
+        if isinstance(obj, (Coin, Enemy)):
             obj.update(delta, player.position)
         else:
             obj.update(delta)
@@ -173,7 +173,7 @@ def main():
 
     player = Player()
     
-    state.switch_to_upgrade(player)
+    state.switch_to_menu(player)
     delta: float = 0.0
     run = True
     while run:

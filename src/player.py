@@ -14,14 +14,11 @@ from particle.particle import ParticleEffect
 
 
 ROTATE_SPEED = 180.0
-THRUST_STRENGTH = 25.0
 MAX_SPEED = 30.0
-BRAKE_STRENGTH = 0.55
 COLLISION_RADIUS = 0.75
 
 BULLET_RADIUS = 0.2
 BULLET_SPEED = 30.0
-SHOOT_COOLDOWN = 0.4
 BULLET_LIFETIME = 3.0
 
 HOOK_MAX_DISTANCE = 30.0
@@ -81,7 +78,7 @@ class Player(DynamicCollisionCircle):
         self.bullets: list[PlayerBullet] = []
         self.shoot_cooldown = 0.0
 
-        self.coins: int = 100
+        self.coins: int = 0
         self.score: int = 0
 
         self.selected_object: util.LevelObject | None = None
@@ -114,17 +111,21 @@ class Player(DynamicCollisionCircle):
         # thrust
         if keys[pygame.K_w]:
             forward = self.get_forward_vector()
-            thrust_vector: Vector2 = forward * THRUST_STRENGTH
+            thrust_level = self.upgrades['thrust']
+            thrust_strength = 7.5*thrust_level + 20
+            thrust_vector: Vector2 = forward * thrust_strength
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
 
             effect_position = -forward * 1.25 + self.position
-            effect = ParticleEffect.primitive(5, effect_position, self.angle+180, 20, 0, 0, 7, 1, 0.3, 0.1, 5, 2, (255, 50, 50), (255, 215, 0))
+            effect = ParticleEffect.primitive(5, effect_position, self.angle+180, 20, 0, 150, 7, 1, 0.3, 0.1, 5, 2, (255, 50, 50), (255, 215, 0))
             particle_effects.append(effect)
          
         # braking
         if keys[pygame.K_s]:
-            self.velocity.move_towards_ip(Vector2(0, 0), BRAKE_STRENGTH)
+            brake_level = self.upgrades['brakes']
+            brake_strength = 0.2*brake_level + 0.7
+            self.velocity.move_towards_ip(Vector2(0, 0), brake_strength)
         
         lmb_pressed, _, rmb_pressed = pygame.mouse.get_pressed()
         # shoot
@@ -132,7 +133,8 @@ class Player(DynamicCollisionCircle):
             bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
             bullet = PlayerBullet(self.position, bullet_velocity, self)
             self.bullets.append(bullet)
-            self.shoot_cooldown = SHOOT_COOLDOWN
+            fire_rate_level = self.upgrades['fire_rate']
+            self.shoot_cooldown = -0.05*fire_rate_level + 0.4
             resource_manager.get_sound('shoot').play()
         if rmb_pressed:
             if self.selected_object is not None and self.hooked_object is None:
