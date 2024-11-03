@@ -6,7 +6,9 @@ import util
 from util import DynamicCollisionCircle
 from objects.asteroid import Asteroid
 from objects.coin import Coin
+from objects.level_end import LevelEnd
 from globals import resource_manager, particle_effects
+import state
 from particle.particle import ParticleEffect
 
 
@@ -90,7 +92,10 @@ class Player(DynamicCollisionCircle):
         return vec
 
     
-    def handle_input(self, delta: float, keys: pygame.key.ScancodeWrapper):
+    def handle_input(self, screen_size: Vector2, delta: float, keys: pygame.key.ScancodeWrapper):
+        mouse_position = Vector2(pygame.mouse.get_pos())
+        self.angle = math.atan2(mouse_position.y - screen_size.y/2, mouse_position.x - screen_size.x/2) * -180 / math.pi
+
         if keys[pygame.K_LEFT]:
             self.angle += ROTATE_SPEED * delta
         if keys[pygame.K_RIGHT]:
@@ -98,29 +103,29 @@ class Player(DynamicCollisionCircle):
         self.angle = util.wrap(self.angle, 0, 360)
         
         # thrust
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_w]:
             forward = self.get_forward_vector()
             thrust_vector: Vector2 = forward * THRUST_STRENGTH
             self.velocity += thrust_vector * delta
             self.velocity.clamp_magnitude_ip(MAX_SPEED)
 
-            effect_position = -forward + self.position
+            effect_position = -forward * 1.25 + self.position
             effect = ParticleEffect.primitive(5, effect_position, self.angle+180, 20, 0, 0, 7, 1, 0.3, 0.1, 5, 2, (255, 50, 50), (255, 215, 0))
             particle_effects.append(effect)
          
         # braking
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_s]:
             self.velocity.move_towards_ip(Vector2(0, 0), BRAKE_STRENGTH)
         
+        lmb_pressed, _, rmb_pressed = pygame.mouse.get_pressed()
         # shoot
-        if keys[pygame.K_x] and self.shoot_cooldown == 0:
+        if lmb_pressed and self.shoot_cooldown == 0:
             bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
             bullet = PlayerBullet(self.position, bullet_velocity)
             self.bullets.append(bullet)
             self.shoot_cooldown = SHOOT_COOLDOWN
             resource_manager.get_sound('shoot').play()
-        
-        if keys[pygame.K_SPACE]:
+        if rmb_pressed:
             if self.selected_object is not None and self.hooked_object is None:
                 self.hooked_object = self.selected_object
                 self.hook_distance = self.position.distance_to(self.hooked_object.position)
@@ -164,6 +169,8 @@ class Player(DynamicCollisionCircle):
                 resource_manager.get_sound('coin').play()
                 obj.queue_delete = True
                 self.coins += 1
+            elif isinstance(obj, LevelEnd):
+                state.switch_to_upgrade()
 
         
         if raycast_hit_objects:

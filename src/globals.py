@@ -2,19 +2,34 @@ from enum import Enum
 from resource_manager import ResourceManager
 from particle.particle import ParticleEffect
 from util import CollisionCircle
+from ui.ui import UiHandler
 
 
-class GameState(Enum):
+class GameStateEnum(Enum):
     MENU = 0
     PAUSE = 1
     LEVEL = 2
     UPGRADE = 3
 
 
+class GameState:
+    def __init__(self, state: GameStateEnum):
+        self.state = state
+    
+    def set_state(self, state: GameStateEnum):
+        self.state = state
+
+
 resource_manager: ResourceManager = ResourceManager()
 particle_effects: list[ParticleEffect] = []
 added_level_objects: list[CollisionCircle] = []
-game_state = GameState.LEVEL
+game_state = GameState(GameStateEnum.LEVEL)
+ui_handler: UiHandler = UiHandler([])
+
+
+def set_game_state(state: GameState):
+    global game_state
+    game_state = state
 
 
 def load_resources():
@@ -22,6 +37,7 @@ def load_resources():
     resource_manager.load_image('player', 'assets/temp-player.png')
     resource_manager.load_image('asteroid', 'assets/temp-asteroid.png')
     resource_manager.load_image('dest_asteroid', 'assets/temp-dest-asteroid.png')
+    resource_manager.load_image('upgrade', 'assets/upgrade.png')
 
     resource_manager.load_image('space_bg', 'assets/space_bg.png')
 
@@ -34,3 +50,5 @@ def load_resources():
     resource_manager.load_sound('explosion', 'assets/audio/explosion.wav')
     resource_manager.load_sound('coin', 'assets/audio/coin.wav')
     resource_manager.load_sound('hook', 'assets/audio/hook.wav')
+    resource_manager.load_sound('thrust', 'assets/audio/thrust.wav')
+    resource_manager.load_sound('blip', 'assets/audio/blip.wav')
