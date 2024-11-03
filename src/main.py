@@ -176,7 +176,7 @@ def game_over_update(delta: float, win: pygame.Surface, title_font: pygame.font.
 
 def main():
     global added_level_objects, particle_effects, game_state, level_manager
-    win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
+    win = pygame.display.set_mode((1024, 576), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
     pygame.display.set_caption('Masteroids')
     clock = pygame.time.Clock()
     title_font = pygame.font.Font(f'{ASSETS_PATH}/font/Pixeboy.ttf', 75)
