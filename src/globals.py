@@ -50,7 +50,7 @@ def set_game_state(state: GameState):
 
 def load_resources():
     global resource_manager
-    resource_manager.load_image('player', f'{ASSETS_PATH}/temp-player.png')
+    resource_manager.load_image('player', f'{ASSETS_PATH}/player.png')
     resource_manager.load_image('asteroid', f'{ASSETS_PATH}/temp-asteroid.png')
     resource_manager.load_image('dest_asteroid', f'{ASSETS_PATH}/temp-dest-asteroid.png')
     resource_manager.load_image('orbiter', f'{ASSETS_PATH}/orbiter.png')

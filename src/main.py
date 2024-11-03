@@ -163,7 +163,7 @@ def main():
 
     player = Player()
     
-    state.switch_to_upgrade(player)
+    state.switch_to_menu(player)
     delta: float = 0.0
     run = True
     while run:
