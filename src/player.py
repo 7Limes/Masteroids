@@ -50,9 +50,10 @@ def ray_intersect_circle(ray_origin: Vector2, ray_angle: float, circle_center: V
 
 
 class PlayerBullet(DynamicCollisionCircle):
-    def __init__(self, position: Vector2, velocity: Vector2):
+    def __init__(self, position: Vector2, velocity: Vector2, parent: "Player"):
         super().__init__(position, BULLET_RADIUS, velocity)
         self.lifetime = BULLET_LIFETIME
+        self.parent: Player = parent
     
     def update(self, delta: float, level_objects: list[util.LevelObject]) -> bool:
         super().update(delta)
@@ -60,7 +61,7 @@ class PlayerBullet(DynamicCollisionCircle):
             if not self.hits(obj):
                 continue
             if isinstance(obj, (Asteroid, Enemy)):
-                obj.damage()
+                obj.damage(self.parent)
                 return True
                 
         self.lifetime -= delta
@@ -80,7 +81,8 @@ class Player(DynamicCollisionCircle):
         self.bullets: list[PlayerBullet] = []
         self.shoot_cooldown = 0.0
 
-        self.coins: int = 0
+        self.coins: int = 100
+        self.score: int = 0
 
         self.selected_object: util.LevelObject | None = None
         self.hooked_object: util.LevelObject | None = None
@@ -88,7 +90,8 @@ class Player(DynamicCollisionCircle):
 
         self.upgrades = {
             'fire_rate': 0,
-            'brakes': 0
+            'brakes': 0,
+            'thrust': 0,
         }
     
 
@@ -127,7 +130,7 @@ class Player(DynamicCollisionCircle):
         # shoot
         if lmb_pressed and self.shoot_cooldown == 0:
             bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
-            bullet = PlayerBullet(self.position, bullet_velocity)
+            bullet = PlayerBullet(self.position, bullet_velocity, self)
             self.bullets.append(bullet)
             self.shoot_cooldown = SHOOT_COOLDOWN
             resource_manager.get_sound('shoot').play()
@@ -202,6 +205,10 @@ class Player(DynamicCollisionCircle):
         self.bullets.clear
         self.selected_object = None
         self.hooked_object = None
+    
+
+    def full_reset(self):
+        self.__init__()
 
     
     def draw(self, surf: Surface):

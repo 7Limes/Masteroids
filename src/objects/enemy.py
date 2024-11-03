@@ -19,7 +19,7 @@ class Enemy(util.LevelObject):
         self.shake_cooldown = 0.0
     
 
-    def destroy(self):
+    def destroy(self, player):
         global resource_manager, particle_effects
         self.queue_delete = True
         effect = ParticleEffect.primitive(20, self.position, 0, 360, 0, 200, 7, 1, 1, 0.2, 5, 2, (255, 50, 50), (255, 215, 0))
@@ -28,12 +28,13 @@ class Enemy(util.LevelObject):
 
         coin = Coin(self.position, Vector2(random.uniform(-10, 10), random.uniform(-10, 10)))
         added_level_objects.append(coin)
+        player.score += 100
     
 
-    def damage(self):
+    def damage(self, player):
         self.health -= 1
         if self.health <= 0:
-            self.destroy()
+            self.destroy(player)
         else:
             resource_manager.get_sound('hit').play()
             self.shake_cooldown = 0.1

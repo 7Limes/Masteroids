@@ -19,7 +19,7 @@ class Asteroid(util.LevelObject):
         self.shake_cooldown = 0.0
     
 
-    def destroy(self):
+    def destroy(self, player):
         global resource_manager, particle_effects
         self.queue_delete = True
         sprites = resource_manager.get_full_spritesheet('fragments')
@@ -27,12 +27,13 @@ class Asteroid(util.LevelObject):
         effect = ParticleEffect(particle_count, self.position, 0, 360, 0, 200, 3.5, 1, 2, 0.2, sprites)
         particle_effects.append(effect)
         resource_manager.get_sound('explosion').play()
+        player.score += 50
 
 
-    def damage(self):
+    def damage(self, player):
         self.health -= 1
         if self.health <= 0:
-            self.destroy()
+            self.destroy(player)
         else:
             resource_manager.get_sound('hit').play()
             self.shake_cooldown = 0.1
@@ -56,13 +57,14 @@ class CoinAsteroid(Asteroid):
         super().__init__(position, radius, velocity, angular_velocity, coin_asteroid_sprite)
     
 
-    def destroy(self):
+    def destroy(self, player):
         global added_level_objects
-        super().destroy()
+        super().destroy(player)
         amount_coins = math.floor(2 * math.sqrt(self.radius) + random.randint(-1, 1))
         for _ in range(amount_coins):
             coin_position: Vector2 = self.position + Vector2.from_polar((random.uniform(0, self.radius), random.uniform(0, 360)))
             coin_velocity = (coin_position - self.position).normalize() * 15
             coin = Coin(coin_position, coin_velocity)
             added_level_objects.append(coin)
+        player.score += 50
 

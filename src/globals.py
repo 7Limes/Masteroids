@@ -75,3 +75,4 @@ def load_resources():
     resource_manager.load_sound('blip', f'{ASSETS_PATH}/audio/blip.wav')
     resource_manager.load_sound('death', f'{ASSETS_PATH}/audio/death.wav')
     resource_manager.load_sound('deltarune_explosion', f'{ASSETS_PATH}/audio/deltarune_explosion.mp3')
+    resource_manager.load_sound('upgrade', f'{ASSETS_PATH}/audio/upgrade.wav')

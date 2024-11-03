@@ -18,7 +18,7 @@ MAX_DISTANCE_FROM_PATH = 50.0
 DANGER_OVERLAY_DISTANCE = 20.0
 
 
-def draw_debug_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
+def draw_label(surf: pygame.Surface, font: pygame.font.Font, text: str, position: tuple[int, int]):
     surf.blit(font.render(text, True, (255, 255, 255)), position)
 
 
@@ -81,7 +81,7 @@ def menu_update(win: pygame.Surface, font: pygame.font.Font):
 
 
 
-def level_update(delta: float, win: pygame.Surface, player: Player, keys: pygame.key.ScancodeWrapper, 
+def level_update(delta: float, win: pygame.Surface, font: pygame.font.Font, player: Player, keys: pygame.key.ScancodeWrapper, 
                  level_objects: list[util.LevelObject], path_points: list[pygame.Vector2]):
     player.handle_input(pygame.Vector2(win.get_size()), delta, keys)
     player.update(delta, level_objects)
@@ -119,6 +119,11 @@ def level_update(delta: float, win: pygame.Surface, player: Player, keys: pygame
         overlay = pygame.Surface(win.get_size(), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, overlay_alpha))
         win.blit(overlay, (0, 0))
+    
+    draw_label(win, font, f'Score: {player.score}', (5, 5))
+    coin_icon = pygame.transform.scale_by(resource_manager.get_spritesheet_image('coin', 0), 2)
+    win.blit(coin_icon, (5, 30))
+    draw_label(win, font, f'x {player.coins}', (30, 23))
 
 
 def upgrade_update(delta: float, win: pygame.Surface, title_font: pygame.font.Font, font: pygame.font.Font, player: Player):
@@ -127,12 +132,17 @@ def upgrade_update(delta: float, win: pygame.Surface, title_font: pygame.font.Fo
     if prev_selected_element is None and ui_handler.selected_element:
         resource_manager.get_sound('blip').play()
     util.tile_surface(win, resource_manager.get_image('space_bg'), 3)
-    ui_handler.draw(win, font, offset=pygame.Vector2(0, 100))
+    ui_handler.draw(win, font, offset=pygame.Vector2(0, 150))
 
     upgrades_title = title_font.render('Upgrades', True, (255, 255, 255))
     upgrades_title_position = pygame.Vector2(win.get_size()) / 2 - pygame.Vector2(upgrades_title.get_size()) / 2
     upgrades_title_position.y = 25
     win.blit(upgrades_title, upgrades_title_position)
+
+    coin_icon = pygame.transform.scale_by(resource_manager.get_spritesheet_image('coin', 0), 2)
+    screen_center_x = win.get_size()[0] / 2
+    win.blit(coin_icon, (screen_center_x-27, 107))
+    draw_label(win, font, f'x {player.coins}', (screen_center_x, 100))
 
 
 def game_over_update(delta: float, win: pygame.Surface, font: pygame.font.Font, player: Player, game_over_handler: GameOverHandler):
@@ -163,7 +173,7 @@ def main():
 
     player = Player()
     
-    state.switch_to_menu(player)
+    state.switch_to_upgrade(player)
     delta: float = 0.0
     run = True
     while run:
@@ -177,15 +187,11 @@ def main():
         elif game_state.state == GameStateEnum.PAUSE:
             pass
         elif game_state.state == GameStateEnum.LEVEL:
-            level_update(delta, win, player, keys, level_manager.level_objects, level_manager.path_points)
+            level_update(delta, win, font, player, keys, level_manager.level_objects, level_manager.path_points)
         elif game_state.state == GameStateEnum.UPGRADE:
             upgrade_update(delta, win, title_font, font, player)
         elif game_state.state == GameStateEnum.GAME_OVER:
             game_over_update(delta, win, title_font, player, game_over_handler)
-
-        draw_debug_label(win, font, f'fps: {clock.get_fps():.1f}', (0, 0))
-        draw_debug_label(win, font, f'pos: {player.position}', (0, 20))
-        draw_debug_label(win, font, f'coins: {player.coins}', (0, 60))
 
         delta = clock.tick(60) / 1000.0
         pygame.display.flip()
