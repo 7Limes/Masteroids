@@ -1,1 +1,1 @@
-pyinstaller --add-data "assets:assets" --windowed --onefile src/main.py
+pyinstaller --add-data "assets:assets" --icon=assets/icon.png --windowed --onefile src/main.py
