@@ -14,7 +14,6 @@ import state
 from particle.particle import ParticleEffect
 
 
-ROTATE_SPEED = 180.0
 MAX_SPEED = 30.0
 COLLISION_RADIUS = 0.75
 
@@ -23,6 +22,9 @@ BULLET_SPEED = 30.0
 BULLET_LIFETIME = 3.0
 
 HOOK_MAX_DISTANCE = 30.0
+
+KEYBOARD_ROTATE_SPEED = 220.0
+
 
 def ray_intersect_circle(ray_origin: Vector2, ray_angle: float, circle_center: Vector2, circle_radius: float) -> bool:
     # Ensure the ray_direction is normalized
@@ -102,9 +104,9 @@ class Player(DynamicCollisionCircle):
     def handle_input(self, screen_size: Vector2, delta: float, keys: pygame.key.ScancodeWrapper):
         if globals.keyboard_aim:
             if keys[pygame.K_LEFT]:
-                self.angle += ROTATE_SPEED * delta
+                self.angle += KEYBOARD_ROTATE_SPEED * delta
             if keys[pygame.K_RIGHT]:
-                self.angle -= ROTATE_SPEED * delta
+                self.angle -= KEYBOARD_ROTATE_SPEED * delta
             self.angle = util.wrap(self.angle, 0, 360)
 
             thrust = keys[pygame.K_UP]
