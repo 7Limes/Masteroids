@@ -117,26 +117,35 @@ def get_viewport_rect(surf: Surface, view_pos: Vector2) -> Rect:
 
 
 class LevelObject(DynamicCollisionCircle):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2, sprite: Surface):
-        super().__init__(position, radius, velocity)    
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, angular_velocity: float, sprite: Surface):
+        super().__init__(position, radius, velocity)
+        self.angular_velocity = angular_velocity
+        self.angle = 0.0
         self.sprite = sprite
 
         scaled_sprite_size = radius * 2 * RENDER_SCALE
         self.sprite = pygame.transform.scale(sprite, Vector2(scaled_sprite_size, scaled_sprite_size))
-        self.sprite_half_size = Vector2(scaled_sprite_size, scaled_sprite_size) / 2
-
         self.queue_delete = False
+
+
+    def update(self, delta: float):
+        super().update(delta)
+        self.angle += self.angular_velocity * delta
 
 
     def draw(self, surf: Surface, view_pos: Vector2, screen_coord_offset: Vector2=Vector2(0, 0)):
         screen_coord = self.get_screen_coord(surf, view_pos) + screen_coord_offset
-        blit_position = screen_coord - self.sprite_half_size
-        surf.blit(self.sprite, blit_position)
+        blit_sprite = self.sprite
+        if self.angle != 0:
+            blit_sprite = pygame.transform.rotate(self.sprite, self.angle)
+        
+        blit_position = screen_coord - Vector2(blit_sprite.get_size()) / 2
+        surf.blit(blit_sprite, blit_position)
 
 
 class AnimatedLevelObject(LevelObject):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2, sprites: list[Surface], frame_duration: float):
-        super().__init__(position, radius, velocity, sprites[0])
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, angular_velocity: float, sprites: list[Surface], frame_duration: float):
+        super().__init__(position, radius, velocity, angular_velocity, sprites[0])
         scaled_sprite_size = radius * 2 * RENDER_SCALE
         scaled_sprites = []
         for sprite in sprites:

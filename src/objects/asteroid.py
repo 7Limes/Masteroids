@@ -10,11 +10,11 @@ from objects.coin import Coin
 
 
 class Asteroid(util.LevelObject):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2, sprite: Surface=None):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, angular_velocity: float, sprite: Surface=None):
         if sprite is None:
             sprite = resource_manager.get_image('asteroid')
-        super().__init__(position, radius, velocity, sprite)
-        
+        super().__init__(position, radius, velocity, angular_velocity, sprite)
+
         self.health = math.floor(1.25 * math.sqrt(radius))
         self.shake_cooldown = 0.0
     
@@ -51,9 +51,9 @@ class Asteroid(util.LevelObject):
     
 
 class CoinAsteroid(Asteroid):
-    def __init__(self, position: Vector2, radius: float, velocity: Vector2):
+    def __init__(self, position: Vector2, radius: float, velocity: Vector2, angular_velocity: float):
         coin_asteroid_sprite = resource_manager.get_image('dest_asteroid')
-        super().__init__(position, radius, velocity, coin_asteroid_sprite)
+        super().__init__(position, radius, velocity, angular_velocity, coin_asteroid_sprite)
     
 
     def destroy(self):

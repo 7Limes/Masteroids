@@ -34,8 +34,8 @@ def draw_path(surf: Surface, view_pos: Vector2, points: list[Vector2]):
 def generate_asteroid(position: Vector2) -> Asteroid:
     ast_size = random.randint(4, 12) / 2.0
     if random.randrange(0, 7) == 0:
-        return CoinAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
-    return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
+        return CoinAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), random.uniform(-10, 10))
+    return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), random.uniform(-10, 10))
 
 
 def generate_object(position: Vector2) -> util.LevelObject:

@@ -38,6 +38,7 @@ def load_resources():
     resource_manager.load_image('asteroid', 'assets/temp-asteroid.png')
     resource_manager.load_image('dest_asteroid', 'assets/temp-dest-asteroid.png')
     resource_manager.load_image('upgrade', 'assets/upgrade.png')
+    resource_manager.load_image('orbiter', 'assets/orbiter.png')
 
     resource_manager.load_image('space_bg', 'assets/space_bg.png')
 

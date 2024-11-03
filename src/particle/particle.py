@@ -23,7 +23,7 @@ class Particle:
 
     def tickdraw(self, delta: float, surf: Surface, view_pos: Vector2) -> bool:
         self.position += self.velocity * delta
-        self.angle += self.particle_angular_velocity * delta
+        self.angle += util.wrap(self.particle_angular_velocity * delta, 0, 360)
         
         rotated_sprite = pygame.transform.rotate(self.sprite, self.angle)
         sprite_half_size = Vector2(rotated_sprite.get_size()) / 2

@@ -12,7 +12,7 @@ MAGNETIZE_ACCEL_BEGIN_SPEED = 200.0
 class Coin(util.AnimatedLevelObject):
     def __init__(self, position: Vector2, velocity: Vector2):
         coin_sprites = resource_manager.get_full_spritesheet('coin')
-        super().__init__(position, RADIUS, velocity, coin_sprites, ANIMATION_FRAME_DURATION)
+        super().__init__(position, RADIUS, velocity, 0.0, coin_sprites, ANIMATION_FRAME_DURATION)
         self.magnetize_delay = 0.5
     
 

@@ -1,5 +1,5 @@
 import random
-import pygame
+import math
 from pygame import Vector2, Surface
 import util
 from globals import resource_manager, particle_effects, added_level_objects
@@ -14,7 +14,7 @@ ORBITER_VIEW_DISTANCE = 30.0
 
 class Enemy(util.LevelObject):
     def __init__(self, position: Vector2, radius: float, velocity: Vector2, sprite: Surface, health: int):
-        super().__init__(position, radius, velocity, sprite)
+        super().__init__(position, radius, velocity, 0, sprite)
         self.health = health
         self.shake_cooldown = 0.0
     
@@ -47,14 +47,15 @@ class Enemy(util.LevelObject):
 
 class Orbiter(Enemy):
     def __init__(self, position: util.Vector2):
-        enemy_sprite = Surface((24, 24), pygame.SRCALPHA)
-        enemy_sprite.fill((255, 0, 0))
+        enemy_sprite = resource_manager.get_image('orbiter')
         super().__init__(position, ORBITER_RADIUS, Vector2(0, 0), enemy_sprite, 1)
     
 
     def update(self, delta: float, player_position: Vector2):
         if self.position.distance_to(player_position) < ORBITER_VIEW_DISTANCE:
             self.velocity += (player_position - self.position).normalize() * ORBITER_ACCEL * delta
+            angle = math.atan2(self.position.y - player_position.y, self.position.x - player_position.x) * 180 / math.pi
+            self.angle = angle
         else:
             self.velocity.move_towards_ip((0, 0), 0.1)
         super().update(delta)
