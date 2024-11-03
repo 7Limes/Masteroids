@@ -1,5 +1,6 @@
 from globals import game_state, GameStateEnum, resource_manager
 from pygame import Vector2
+import globals
 from globals import resource_manager, ui_handler, particle_effects, added_level_objects
 from ui.ui import UpgradeBox, LabelButton
 from level_gen import level_manager
@@ -17,10 +18,17 @@ def initialize_main_menu(player):
         switch_to_level(player)
     def tutorial_callback():
         open_tutorial_window()
+    def controls_callback():
+        globals.keyboard_aim = not globals.keyboard_aim
+        if globals.keyboard_aim:
+            controls_button.text = 'Aiming: Keyboard'
+        else:
+            controls_button.text = 'Aiming: Mouse'
 
     start_button = LabelButton(Vector2(100, 100), Vector2(400, 80), start_callback, 'Start')
     tutorial_button = LabelButton(Vector2(100, 100), Vector2(400, 80), tutorial_callback, 'How to Play')
-    ui_handler.elements.extend([start_button, tutorial_button])
+    controls_button = LabelButton(Vector2(100, 100), Vector2(650, 80), controls_callback, 'Aiming: Keyboard' if globals.keyboard_aim else 'Aiming: Mouse')
+    ui_handler.elements.extend([start_button, tutorial_button, controls_button])
 
 
 def calculate_upgrade_cost(level: int) -> int:

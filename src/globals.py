@@ -29,6 +29,7 @@ particle_effects: list[ParticleEffect] = []
 added_level_objects: list[CollisionCircle] = []
 game_state = GameState(GameStateEnum.LEVEL)
 ui_handler: UiHandler = UiHandler([])
+keyboard_aim = False
 
 
 def get_assets_path() -> str:
