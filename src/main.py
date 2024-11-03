@@ -63,6 +63,7 @@ class GameOverHandler:
         if self.timer > 8:
             self.reset()
             player.full_reset()
+            level_manager.reset()
             state.switch_to_menu(player)
     
     def reset(self):
