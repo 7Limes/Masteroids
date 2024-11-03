@@ -8,6 +8,7 @@ from objects.asteroid import Asteroid
 from objects.coin import Coin
 from objects.enemy import Enemy
 from objects.level_end import LevelEnd
+import globals
 from globals import resource_manager, particle_effects
 import state
 from particle.particle import ParticleEffect
@@ -99,17 +100,28 @@ class Player(DynamicCollisionCircle):
 
     
     def handle_input(self, screen_size: Vector2, delta: float, keys: pygame.key.ScancodeWrapper):
-        mouse_position = Vector2(pygame.mouse.get_pos())
-        self.angle = math.atan2(mouse_position.y - screen_size.y/2, mouse_position.x - screen_size.x/2) * -180 / math.pi
+        if globals.keyboard_aim:
+            if keys[pygame.K_LEFT]:
+                self.angle += ROTATE_SPEED * delta
+            if keys[pygame.K_RIGHT]:
+                self.angle -= ROTATE_SPEED * delta
+            self.angle = util.wrap(self.angle, 0, 360)
 
-        if keys[pygame.K_LEFT]:
-            self.angle += ROTATE_SPEED * delta
-        if keys[pygame.K_RIGHT]:
-            self.angle -= ROTATE_SPEED * delta
-        self.angle = util.wrap(self.angle, 0, 360)
+            thrust = keys[pygame.K_UP]
+            brake = keys[pygame.K_DOWN]
+            shoot = keys[pygame.K_z]
+            hook = keys[pygame.K_x]
+        else:  # mouse aiming
+            mouse_position = Vector2(pygame.mouse.get_pos())
+            self.angle = math.atan2(mouse_position.y - screen_size.y/2, mouse_position.x - screen_size.x/2) * -180 / math.pi
+
+            thrust = keys[pygame.K_w]
+            brake = keys[pygame.K_s]
+            shoot, _, hook = pygame.mouse.get_pressed()
+        
         
         # thrust
-        if keys[pygame.K_w]:
+        if thrust:
             forward = self.get_forward_vector()
             thrust_level = self.upgrades['thrust']
             thrust_strength = 7.5*thrust_level + 20
@@ -122,21 +134,22 @@ class Player(DynamicCollisionCircle):
             particle_effects.append(effect)
          
         # braking
-        if keys[pygame.K_s]:
+        if brake:
             brake_level = self.upgrades['brakes']
             brake_strength = 0.2*brake_level + 0.7
             self.velocity.move_towards_ip(Vector2(0, 0), brake_strength)
         
-        lmb_pressed, _, rmb_pressed = pygame.mouse.get_pressed()
         # shoot
-        if lmb_pressed and self.shoot_cooldown == 0:
+        if shoot and self.shoot_cooldown == 0:
             bullet_velocity = self.get_forward_vector() * BULLET_SPEED + self.velocity
             bullet = PlayerBullet(self.position, bullet_velocity, self)
             self.bullets.append(bullet)
             fire_rate_level = self.upgrades['fire_rate']
             self.shoot_cooldown = -0.05*fire_rate_level + 0.4
             resource_manager.get_sound('shoot').play()
-        if rmb_pressed:
+        
+        # hook
+        if hook:
             if self.selected_object is not None and self.hooked_object is None:
                 self.hooked_object = self.selected_object
                 self.hook_distance = self.position.distance_to(self.hooked_object.position)
