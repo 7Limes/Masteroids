@@ -1,6 +1,3 @@
-import ctypes
-import platform
-
 import pygame
 pygame.init()
 pygame.mixer.init()
@@ -179,8 +176,6 @@ def game_over_update(delta: float, win: pygame.Surface, title_font: pygame.font.
 
 def main():
     global added_level_objects, particle_effects, game_state, level_manager
-    if platform.system == 'Windows':
-        ctypes.windll.shcore.SetProcessDpiAwareness(1)  # fix clarity for some windows machines
     win = pygame.display.set_mode((1024, 576), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
     pygame.display.set_caption('Masteroids')
     clock = pygame.time.Clock()
