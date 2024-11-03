@@ -14,8 +14,7 @@ class Asteroid(util.LevelObject):
         if sprite is None:
             sprite = resource_manager.get_image('asteroid')
         super().__init__(position, radius, velocity, sprite)
-
-        self.destroyed = False
+        
         self.health = math.floor(1.25 * math.sqrt(radius))
         self.shake_cooldown = 0.0
     

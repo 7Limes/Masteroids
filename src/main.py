@@ -9,6 +9,7 @@ from util import CollisionCircle
 import globals
 from globals import particle_effects, added_level_objects, resource_manager, game_state, GameStateEnum, ui_handler
 from objects.coin import Coin
+from objects.enemy import Orbiter
 import state
 
 
@@ -37,7 +38,7 @@ def level_update(delta: float, win: pygame.Surface, player: Player, keys: pygame
     player.update(delta, level_objects)
 
     for obj in level_objects:
-        if isinstance(obj, Coin):
+        if isinstance(obj, (Coin, Orbiter)):
             obj.update(delta, player.position)
         else:
             obj.update(delta)
@@ -78,9 +79,9 @@ def main():
 
     player = Player()
 
-    path_points, level_objects = level_gen.generate_level()
+    difficulty = 1
+    path_points, level_objects = level_gen.generate_level(difficulty)
     
-    state.switch_to_upgrade()
     delta: float = 0.0
     run = True
     while run:

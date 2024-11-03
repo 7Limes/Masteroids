@@ -6,6 +6,7 @@ import util
 from util import DynamicCollisionCircle
 from objects.asteroid import Asteroid
 from objects.coin import Coin
+from objects.enemy import Enemy
 from objects.level_end import LevelEnd
 from globals import resource_manager, particle_effects
 import state
@@ -58,7 +59,7 @@ class PlayerBullet(DynamicCollisionCircle):
         for obj in level_objects:
             if not self.hits(obj):
                 continue
-            if isinstance(obj, Asteroid):
+            if isinstance(obj, (Asteroid, Enemy)):
                 obj.damage()
                 return True
                 

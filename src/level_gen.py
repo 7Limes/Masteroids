@@ -1,8 +1,10 @@
 import random
+import math
 import pygame
 from pygame import Vector2, Surface
 import util
 from objects.asteroid import Asteroid, CoinAsteroid
+from objects.enemy import Orbiter
 from objects.level_end import LevelEnd
 
 
@@ -29,19 +31,28 @@ def draw_path(surf: Surface, view_pos: Vector2, points: list[Vector2]):
         util.draw_circle_alpha(surf, (128, 128, 128), 128, screen_coordinate, 5)
 
 
-def generate_asteroid(position: Vector2):
+def generate_asteroid(position: Vector2) -> Asteroid:
     ast_size = random.randint(4, 12) / 2.0
-    if random.randrange(0, 5) == 0:
+    if random.randrange(0, 7) == 0:
         return CoinAsteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
     return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)))
 
 
+def generate_object(position: Vector2) -> util.LevelObject:
+    r = random.randrange(0, 100)
+    if r < 60:
+        return generate_asteroid(position)
+    return Orbiter(position)
+
+
 
 # Creates a path and populates it with objects.
-def generate_level() -> tuple[list[Vector2], list[util.LevelObject]]:
+def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObject]]:
     end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
-    amount_points = random.randrange(7, 15)
+    amount_points = random.randrange(10, 15)
     path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
+
+    average_amount_objects = math.floor(6 * math.sqrt(difficulty))
 
     level_objects: list[util.LevelObject] = [
         LevelEnd(end_point)
@@ -50,9 +61,9 @@ def generate_level() -> tuple[list[Vector2], list[util.LevelObject]]:
         line_length = p1.distance_to(p2)
         shift_vector = (p2 - p1).normalize()
         perp_vector = shift_vector.rotate(90)
-        for i in range(random.randrange(7, 15)):
+        for i in range(average_amount_objects + random.randint(-2, 2)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
             obj_position = obj_line_position + (perp_vector * random.uniform(-40, 40))
-            obj = generate_asteroid(obj_position)
+            obj = generate_object(obj_position)
             level_objects.append(obj)
     return (path_points, level_objects)
