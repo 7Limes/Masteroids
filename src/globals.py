@@ -74,7 +74,6 @@ def load_resources():
     resource_manager.load_sound('explosion', f'{ASSETS_PATH}/audio/explosion.wav')
     resource_manager.load_sound('coin', f'{ASSETS_PATH}/audio/coin.wav')
     resource_manager.load_sound('hook', f'{ASSETS_PATH}/audio/hook.wav')
-    resource_manager.load_sound('thrust', f'{ASSETS_PATH}/audio/thrust.wav')
     resource_manager.load_sound('blip', f'{ASSETS_PATH}/audio/blip.wav')
     resource_manager.load_sound('death', f'{ASSETS_PATH}/audio/death.wav')
     resource_manager.load_sound('deltarune_explosion', f'{ASSETS_PATH}/audio/deltarune_explosion.mp3')
