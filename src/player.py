@@ -197,7 +197,8 @@ class Player(DynamicCollisionCircle):
 
         if self.selected_object is not None:
             selected_screen_coord = util.world_to_screen(surf, self.position, self.selected_object.position, util.RENDER_SCALE)
-            pygame.draw.circle(surf, (255, 0, 255), selected_screen_coord, 5)
+            pygame.draw.circle(surf, (80, 80, 80), selected_screen_coord, 5)
+            pygame.draw.circle(surf, (80, 80, 80), selected_screen_coord, 8, 1)
         if self.hooked_object is not None:
             hooked_screen_coord = util.world_to_screen(surf, self.position, self.hooked_object.position, util.RENDER_SCALE)
             pygame.draw.line(surf, (128, 128, 128), surf_center, hooked_screen_coord)
