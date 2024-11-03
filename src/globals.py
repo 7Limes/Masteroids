@@ -1,4 +1,7 @@
 from enum import Enum
+from pathlib import Path
+import sys
+import os
 from resource_manager import ResourceManager
 from particle.particle import ParticleEffect
 from util import CollisionCircle
@@ -28,6 +31,18 @@ game_state = GameState(GameStateEnum.LEVEL)
 ui_handler: UiHandler = UiHandler([])
 
 
+def get_assets_path() -> str:
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = str(Path(__file__).resolve().parent.parent)
+    
+    return os.path.join(base_path, 'assets')
+
+
+ASSETS_PATH = get_assets_path()
+
+
 def set_game_state(state: GameState):
     global game_state
     game_state = state
@@ -35,26 +50,28 @@ def set_game_state(state: GameState):
 
 def load_resources():
     global resource_manager
-    resource_manager.load_image('player', 'assets/temp-player.png')
-    resource_manager.load_image('asteroid', 'assets/temp-asteroid.png')
-    resource_manager.load_image('dest_asteroid', 'assets/temp-dest-asteroid.png')
-    resource_manager.load_image('upgrade', 'assets/upgrade.png')
-    resource_manager.load_image('orbiter', 'assets/orbiter.png')
+    resource_manager.load_image('player', f'{ASSETS_PATH}/temp-player.png')
+    resource_manager.load_image('asteroid', f'{ASSETS_PATH}/temp-asteroid.png')
+    resource_manager.load_image('dest_asteroid', f'{ASSETS_PATH}/temp-dest-asteroid.png')
+    resource_manager.load_image('orbiter', f'{ASSETS_PATH}/orbiter.png')
+    resource_manager.load_image('fire_rate_icon', f'{ASSETS_PATH}/shoot_upgrade.png')
+    resource_manager.load_image('brakes_icon', f'{ASSETS_PATH}/brakes_upgrade.png')
+    resource_manager.load_image('thrust_icon', f'{ASSETS_PATH}/fire_upgrade.png')
 
-    resource_manager.load_image('space_bg', 'assets/space_bg.png')
-    resource_manager.load_image('menu_bg', 'assets/menu_bg.png')
+    resource_manager.load_image('space_bg', f'{ASSETS_PATH}/space_bg.png')
+    resource_manager.load_image('menu_bg', f'{ASSETS_PATH}/menu_bg.png')
 
-    resource_manager.load_spritesheet('fragments', 'assets/fragments.png', [8, 8])
-    resource_manager.load_spritesheet('coin', 'assets/coin.png', [8, 8])
-    resource_manager.load_spritesheet('level_end_ss', 'assets/level_end_ss.png', [25, 25])
-    resource_manager.load_spritesheet('explosion', 'assets/explosion.png', [200, 250])
+    resource_manager.load_spritesheet('fragments', f'{ASSETS_PATH}/fragments.png', [8, 8])
+    resource_manager.load_spritesheet('coin', f'{ASSETS_PATH}/coin.png', [8, 8])
+    resource_manager.load_spritesheet('level_end_ss', f'{ASSETS_PATH}/level_end_ss.png', [25, 25])
+    resource_manager.load_spritesheet('explosion', f'{ASSETS_PATH}/explosion.png', [200, 250])
 
-    resource_manager.load_sound('shoot', 'assets/audio/shoot.wav')
-    resource_manager.load_sound('hit', 'assets/audio/hit.wav')
-    resource_manager.load_sound('explosion', 'assets/audio/explosion.wav')
-    resource_manager.load_sound('coin', 'assets/audio/coin.wav')
-    resource_manager.load_sound('hook', 'assets/audio/hook.wav')
-    resource_manager.load_sound('thrust', 'assets/audio/thrust.wav')
-    resource_manager.load_sound('blip', 'assets/audio/blip.wav')
-    resource_manager.load_sound('death', 'assets/audio/death.wav')
-    resource_manager.load_sound('deltarune_explosion', 'assets/audio/deltarune_explosion.mp3')
+    resource_manager.load_sound('shoot', f'{ASSETS_PATH}/audio/shoot.wav')
+    resource_manager.load_sound('hit', f'{ASSETS_PATH}/audio/hit.wav')
+    resource_manager.load_sound('explosion', f'{ASSETS_PATH}/audio/explosion.wav')
+    resource_manager.load_sound('coin', f'{ASSETS_PATH}/audio/coin.wav')
+    resource_manager.load_sound('hook', f'{ASSETS_PATH}/audio/hook.wav')
+    resource_manager.load_sound('thrust', f'{ASSETS_PATH}/audio/thrust.wav')
+    resource_manager.load_sound('blip', f'{ASSETS_PATH}/audio/blip.wav')
+    resource_manager.load_sound('death', f'{ASSETS_PATH}/audio/death.wav')
+    resource_manager.load_sound('deltarune_explosion', f'{ASSETS_PATH}/audio/deltarune_explosion.mp3')

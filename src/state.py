@@ -23,23 +23,24 @@ def initialize_upgrade_menu(player):
     global ui_handler
     ui_handler.clear()
 
-    upgrade_icon = resource_manager.get_image('upgrade')
-
     def shooting_upgrade_callback():
         print('chute upgrade')
     def brakes_upgrade_callback():
         print('break upgrade')
-    def speed_upgrade_callback():
+    def thrust_upgrade_callback():
         print('i am speed upgrade')
     def continue_callback():
         switch_to_level(player)
 
-    shooting_upgrade_box = UpgradeBox(Vector2(100, 100), UPGRADE_BOX_SIZE, shooting_upgrade_callback, upgrade_icon, 'Fire Rate', 20, 1)
-    brakes_upgrade_box = UpgradeBox(Vector2(100, 250), UPGRADE_BOX_SIZE, brakes_upgrade_callback, upgrade_icon, 'Brakes', 30, 1)
-    speed_upgrade_box = UpgradeBox(Vector2(100, 300), UPGRADE_BOX_SIZE, speed_upgrade_callback, upgrade_icon, 'Max Speed', 40, 1)
+    fire_rate_icon = resource_manager.get_image('fire_rate_icon')
+    brakes_icon = resource_manager.get_image('brakes_icon')
+    thrust_icon = resource_manager.get_image('thrust_icon')
+    shooting_upgrade_box = UpgradeBox(Vector2(100, 100), UPGRADE_BOX_SIZE, shooting_upgrade_callback, fire_rate_icon, 'Fire Rate', 20, 1)
+    brakes_upgrade_box = UpgradeBox(Vector2(100, 250), UPGRADE_BOX_SIZE, brakes_upgrade_callback, brakes_icon, 'Brakes', 30, 1)
+    thrust_upgrade_box = UpgradeBox(Vector2(100, 300), UPGRADE_BOX_SIZE, thrust_upgrade_callback, thrust_icon, 'Thrust', 40, 1)
     continue_button = LabelButton(Vector2(100, 450), UPGRADE_BOX_SIZE, continue_callback, 'Continue')
 
-    ui_handler.elements.extend([shooting_upgrade_box, brakes_upgrade_box, speed_upgrade_box, continue_button])
+    ui_handler.elements.extend([shooting_upgrade_box, brakes_upgrade_box, thrust_upgrade_box, continue_button])
 
 
 def switch_to_level(player):

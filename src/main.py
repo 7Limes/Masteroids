@@ -7,7 +7,7 @@ from level_gen import level_manager, draw_path
 import util
 from util import CollisionCircle
 import globals
-from globals import particle_effects, added_level_objects, resource_manager, game_state, GameStateEnum, ui_handler
+from globals import particle_effects, added_level_objects, resource_manager, game_state, GameStateEnum, ui_handler, ASSETS_PATH
 from resource_manager import AnimationManager
 from objects.coin import Coin
 from objects.enemy import Orbiter
@@ -155,15 +155,15 @@ def main():
     win = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF | pygame.RESIZABLE | pygame.HWSURFACE)
     pygame.display.set_caption('Masteroids')
     clock = pygame.time.Clock()
-    title_font = pygame.font.Font('assets/font/Pixeboy.ttf', 75)
-    font = pygame.font.Font('assets/font/PixelTandysoft.ttf', 20)
+    title_font = pygame.font.Font(f'{ASSETS_PATH}/font/Pixeboy.ttf', 75)
+    font = pygame.font.Font(f'{ASSETS_PATH}/font/PixelTandysoft.ttf', 20)
     globals.load_resources()
 
     game_over_handler = GameOverHandler()
 
     player = Player()
     
-    state.switch_to_menu(player)
+    state.switch_to_upgrade(player)
     delta: float = 0.0
     run = True
     while run:

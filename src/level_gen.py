@@ -54,13 +54,14 @@ def max_object_distance(difficulty: int):
 
 # Creates a path and populates it with objects.
 def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObject]]:
-    end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
-    amount_points = random.randrange(10, 15)
-    path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
-
+    amount_points = math.floor(0.5*difficulty + 8) if difficulty < 14 else 15
     average_amount_objects = math.floor(4 * math.sqrt(difficulty))
     object_distance = max_object_distance(difficulty)
-    print(average_amount_objects, object_distance)
+
+    end_point = Vector2.from_polar((random.uniform(350, 450), random.uniform(0, 360)))
+    amount_points += random.randrange(-1, 1)
+    path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
+
 
     level_objects: list[util.LevelObject] = [
         LevelEnd(end_point)
@@ -69,9 +70,11 @@ def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObjec
         line_length = p1.distance_to(p2)
         shift_vector = (p2 - p1).normalize()
         perp_vector = shift_vector.rotate(90)
-        for i in range(average_amount_objects + random.randint(-2, 2)):
+        for i in range(average_amount_objects + random.randint(-1, 1)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
             obj_position = obj_line_position + (perp_vector * random.uniform(-object_distance, object_distance))
+            if obj_position.distance_to((0, 0)) < 10:
+                continue
             obj = generate_object(obj_position, difficulty)
             level_objects.append(obj)
     return (path_points, level_objects)

@@ -17,7 +17,7 @@ ROTATE_SPEED = 180.0
 THRUST_STRENGTH = 25.0
 MAX_SPEED = 30.0
 BRAKE_STRENGTH = 0.55
-COLLISION_RADIUS = 1.25
+COLLISION_RADIUS = 0.75
 
 BULLET_RADIUS = 0.2
 BULLET_SPEED = 30.0
@@ -85,6 +85,11 @@ class Player(DynamicCollisionCircle):
         self.selected_object: util.LevelObject | None = None
         self.hooked_object: util.LevelObject | None = None
         self.hook_distance: float = 0.0
+
+        self.upgrades = {
+            'fire_rate': 0,
+            'brakes': 0
+        }
     
 
     def get_forward_vector(self):

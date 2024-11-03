@@ -3,7 +3,7 @@ import pygame
 from pygame import Vector2, Surface
 
 
-ICON_SIZE = 64
+ICON_SIZE = 80
 VERTICAL_PADDING = 10
 
 
