@@ -68,7 +68,7 @@ class PlayerBullet(DynamicCollisionCircle):
     
     def draw(self, surf: Surface, view_pos: Vector2):
         screen_coord = self.get_screen_coord(surf, view_pos)
-        pygame.draw.circle(surf, (0, 0, 255), screen_coord, self.radius * util.RENDER_SCALE)
+        pygame.draw.circle(surf, (255, 255, 255), screen_coord, self.radius * util.RENDER_SCALE)
 
 
 
@@ -171,7 +171,10 @@ class Player(DynamicCollisionCircle):
                 obj.queue_delete = True
                 self.coins += 1
             elif isinstance(obj, LevelEnd):
-                state.switch_to_upgrade()
+                state.switch_to_upgrade(self)
+            else:
+                self.bullets.clear()
+                state.switch_to_game_over(self)
 
         
         if raycast_hit_objects:
@@ -185,7 +188,15 @@ class Player(DynamicCollisionCircle):
         
         self.bullets = [b for b in self.bullets if not b.update(delta, level_objects)]
         self.shoot_cooldown = util.move_toward(self.shoot_cooldown, 0, delta)
+    
 
+    def reset_position(self):
+        self.position = Vector2(0, 0)
+        self.velocity = Vector2(0, 0)
+        self.angle = 0.0
+        self.bullets.clear
+        self.selected_object = None
+        self.hooked_object = None
 
     
     def draw(self, surf: Surface):
@@ -194,7 +205,6 @@ class Player(DynamicCollisionCircle):
         player_sprite_rotated = pygame.transform.rotate(player_sprite, self.angle)
         half_sprite_size = Vector2(player_sprite_rotated.get_size()) / 2
         surf.blit(player_sprite_rotated, surf_center-half_sprite_size)
-
         if self.selected_object is not None:
             selected_screen_coord = util.world_to_screen(surf, self.position, self.selected_object.position, util.RENDER_SCALE)
             pygame.draw.circle(surf, (80, 80, 80), selected_screen_coord, 5)

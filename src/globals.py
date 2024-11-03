@@ -10,6 +10,7 @@ class GameStateEnum(Enum):
     PAUSE = 1
     LEVEL = 2
     UPGRADE = 3
+    GAME_OVER = 4
 
 
 class GameState:
@@ -41,10 +42,12 @@ def load_resources():
     resource_manager.load_image('orbiter', 'assets/orbiter.png')
 
     resource_manager.load_image('space_bg', 'assets/space_bg.png')
+    resource_manager.load_image('menu_bg', 'assets/menu_bg.png')
 
-    resource_manager.load_spritesheet('fragments', 'assets/fragments.png')
-    resource_manager.load_spritesheet('coin', 'assets/coin.png')
-    resource_manager.load_spritesheet('level_end_ss', 'assets/level_end_ss.png')
+    resource_manager.load_spritesheet('fragments', 'assets/fragments.png', [8, 8])
+    resource_manager.load_spritesheet('coin', 'assets/coin.png', [8, 8])
+    resource_manager.load_spritesheet('level_end_ss', 'assets/level_end_ss.png', [25, 25])
+    resource_manager.load_spritesheet('explosion', 'assets/explosion.png', [200, 250])
 
     resource_manager.load_sound('shoot', 'assets/audio/shoot.wav')
     resource_manager.load_sound('hit', 'assets/audio/hit.wav')
@@ -53,3 +56,5 @@ def load_resources():
     resource_manager.load_sound('hook', 'assets/audio/hook.wav')
     resource_manager.load_sound('thrust', 'assets/audio/thrust.wav')
     resource_manager.load_sound('blip', 'assets/audio/blip.wav')
+    resource_manager.load_sound('death', 'assets/audio/death.wav')
+    resource_manager.load_sound('deltarune_explosion', 'assets/audio/deltarune_explosion.mp3')

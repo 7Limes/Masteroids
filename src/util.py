@@ -92,6 +92,10 @@ def wrap(x: float, lower: float, upper: float) -> float:
     return lower + (x - lower) % (upper - lower)
 
 
+def map_range(x: float, from_lower: float, from_upper: float, to_lower: float, to_upper: float) -> float:
+    return to_lower + ((to_upper - to_lower) / (from_upper - from_lower)) * (x - from_lower)
+
+
 def move_toward(current: float, target: float, delta: float) -> float:
     direction = (target - current) > 0
     adjustment = min(abs(target - current), delta)
@@ -114,6 +118,26 @@ def get_viewport_rect(surf: Surface, view_pos: Vector2) -> Rect:
     viewport = Rect.from_pygame_rect(surf.get_rect()).scale_by(1 / RENDER_SCALE)
     half_viewport_size = Vector2(viewport.width, viewport.height) / 2
     return viewport.move(view_pos - half_viewport_size)
+
+
+def closest_segment_distance(point: Vector2, points: list[Vector2]) -> float:
+    min_distance = float('inf')
+
+    for i in range(len(points) - 1):
+        distance = point_to_segment_distance(point, points[i], points[i + 1])
+        min_distance = min(min_distance, distance)
+        
+    return min_distance
+
+def point_to_segment_distance(point: Vector2, segment_start: Vector2, segment_end: Vector2) -> float:
+    segment = segment_end - segment_start
+    if segment.length() == 0:
+        return (point - segment_start).length()
+    point_vector = point - segment_start
+    t = point_vector.dot(segment) / segment.dot(segment)
+    t = max(0, min(1, t))
+    closest = segment_start + segment * t
+    return (point - closest).length()
 
 
 class LevelObject(DynamicCollisionCircle):

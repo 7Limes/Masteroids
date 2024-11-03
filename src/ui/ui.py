@@ -7,23 +7,57 @@ ICON_SIZE = 64
 VERTICAL_PADDING = 10
 
 
-class UpgradeBox:
-    def __init__(self, icon: Surface, title: str, cost: int, level: int, callback: Callable):
+
+class Button:
+    def __init__(self, position: Vector2, size: Vector2, callback: Callable):
+        self.position = position
+        self.size = size
+        self.callback = callback
+
+        self.hovered = False
+    
+    def update_position_size(self, position: Vector2, size: Vector2):
+        self.position = position
+        self.size = size
+    
+    def hits_point(self, point: Vector2):
+        return (point.x > self.position.x and point.x < self.position.x+self.size.x and
+                point.y > self.position.y and point.y < self.position.y+self.size.y)
+
+    def get_surface(self) -> Surface:
+        surf = pygame.Surface(self.size, pygame.SRCALPHA)
+        surf.fill((0, 0, 0, 64))
+        if self.hovered:
+            pygame.draw.rect(surf, (255, 255, 255, 255), (0, 0, self.size.x, self.size.y), 3)
+        return surf
+    
+    def draw(self, surf: Surface):
+        surf.blit(self.get_surface(), self.position)
+
+
+class LabelButton(Button):
+    def __init__(self, position: Vector2, size: Vector2, callback: Callable, text: str):
+        super().__init__(position, size, callback)
+        self.text = text
+    
+    def get_surface(self, font: pygame.font.Font) -> Surface:
+        surf = super().get_surface()
+        label = font.render(self.text, True, (255, 255, 255))
+        label_pos = Vector2(surf.get_size()) / 2 - Vector2(label.get_size()) / 2
+        surf.blit(label, label_pos)
+        return surf
+        
+
+class UpgradeBox(Button):
+    def __init__(self, position: Vector2, size: Vector2, callback: Callable, icon: Surface, title: str, cost: int, level: int):
+        super().__init__(position, size, callback)
         self.icon = pygame.transform.scale(icon, (ICON_SIZE, ICON_SIZE))
         self.title = title
         self.cost = cost
         self.level = level
-        self.callback = callback
 
-        self.position: Vector2 = Vector2(0, 0)
-        self.size: Vector2 = Vector2(0, 0)
-
-        self.hovered = False
-
-
-    def get_surface(self, font: pygame.font.Font, size: Vector2) -> Surface:
-        surf = pygame.Surface(size, pygame.SRCALPHA)
-        surf.fill((0, 0, 0, 64))
+    def get_surface(self, font: pygame.font.Font) -> Surface:
+        surf = super().get_surface()
         surf.blit(self.icon, (5, 5))
 
         title_label = font.render(self.title, True, (255, 255, 255, 255))
@@ -35,20 +69,12 @@ class UpgradeBox:
 
         level_label = font.render(f'Current Level: {self.level}', True, (255, 255, 255, 255))
         surf.blit(level_label, (icon_width + 10, 45))
-
-        if self.hovered:
-            pygame.draw.rect(surf, (255, 255, 255, 255), (0, 0, size.x, size.y), 3)
         return surf
-
-
-    def hits_point(self, point: Vector2):
-        return (point.x > self.position.x and point.x < self.position.x+self.size.x and
-                point.y > self.position.y and point.y < self.position.y+self.size.y)
 
 
 class UiHandler:
     def __init__(self, elements: list):
-        self.elements: list = elements
+        self.elements: list[Button] = elements
         self.selected_element = None
         self.prev_lmb_state = False
 
@@ -75,14 +101,13 @@ class UiHandler:
         self.elements.clear()
 
 
-    def draw(self, surf: Surface, font: pygame.font.Font):
-        surf_width, surf_height = surf.get_size()
-        box_width = max(surf_width / 4, 400)
-        box_height = max(surf_height / 2 / len(self.elements), 80)
-        box_x = surf_width / 2 - box_width / 2
+    def draw(self, surf: Surface, font: pygame.font.Font, padding: int=VERTICAL_PADDING, offset: Vector2=Vector2(0, 0)):
+        if not self.elements:
+            return
+        surf_width = surf.get_size()[0]
         for i, element in enumerate(self.elements):
-            box_y =  i * (box_height + VERTICAL_PADDING) + 30
-            box_surf: Surface = element.get_surface(font, Vector2(box_width, box_height))
+            box_surf: Surface = element.get_surface(font)
+            box_x = surf_width / 2 - element.size.x / 2 + offset.x
+            box_y =  i * (element.size.y + VERTICAL_PADDING) + offset.y
             surf.blit(box_surf, (box_x, box_y))
-            element.position = Vector2(box_x, box_y)
-            element.size = Vector2(box_width, box_height)
+            element.update_position_size(Vector2(box_x, box_y), element.size)

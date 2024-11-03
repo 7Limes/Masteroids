@@ -12,15 +12,16 @@ class ResourceManager:
         img = pygame.image.load(image_path).convert_alpha()
         self.images[image_id] = img
     
-    def load_spritesheet(self, spritesheet_id: str, spritesheet_path: str):
+    def load_spritesheet(self, spritesheet_id: str, spritesheet_path: str, sprite_size: tuple[int, int]):
         sheet_images: list[Surface] = []
         sheet = pygame.image.load(spritesheet_path).convert_alpha()
 
-        sprite_size, spritesheet_height = sheet.get_size()
-        amount_sprites = spritesheet_height // sprite_size
+        spritesheet_height = sheet.get_size()[1]
+        sprite_width, sprite_height = sprite_size
+        amount_sprites = spritesheet_height // sprite_height
         for i in range(amount_sprites):
-            sprite = Surface((sprite_size, sprite_size), pygame.SRCALPHA)
-            sprite.blit(sheet, (0, 0), (0, i*sprite_size, sprite_size, sprite_size))
+            sprite = Surface((sprite_width, sprite_height), pygame.SRCALPHA)
+            sprite.blit(sheet, (0, 0), (0, i*sprite_height, sprite_width, sprite_height))
             sheet_images.append(sprite)
         
         self.spritesheets[spritesheet_id] = sheet_images

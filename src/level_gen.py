@@ -38,12 +38,18 @@ def generate_asteroid(position: Vector2) -> Asteroid:
     return Asteroid(position, ast_size, Vector2(random.uniform(-1, 1), random.uniform(-1, 1)), random.uniform(-10, 10))
 
 
-def generate_object(position: Vector2) -> util.LevelObject:
+def generate_object(position: Vector2, difficulty: float) -> util.LevelObject:
+    orbiter_chance = -4*difficulty+90 if difficulty < 10 else 50
     r = random.randrange(0, 100)
-    if r < 60:
+    if r < orbiter_chance:
         return generate_asteroid(position)
     return Orbiter(position)
 
+
+def max_object_distance(difficulty: int):
+    if difficulty < 10:
+        return math.floor(-10 * math.sqrt(difficulty) + 55)
+    return 1 / (difficulty-9) + 22.38
 
 
 # Creates a path and populates it with objects.
@@ -52,7 +58,9 @@ def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObjec
     amount_points = random.randrange(10, 15)
     path_points = generate_path(Vector2(0, 0), end_point, amount_points, 45, 3)
 
-    average_amount_objects = math.floor(6 * math.sqrt(difficulty))
+    average_amount_objects = math.floor(4 * math.sqrt(difficulty))
+    object_distance = max_object_distance(difficulty)
+    print(average_amount_objects, object_distance)
 
     level_objects: list[util.LevelObject] = [
         LevelEnd(end_point)
@@ -63,7 +71,25 @@ def generate_level(difficulty: int) -> tuple[list[Vector2], list[util.LevelObjec
         perp_vector = shift_vector.rotate(90)
         for i in range(average_amount_objects + random.randint(-2, 2)):
             obj_line_position = shift_vector * random.uniform(0, line_length) + p1
-            obj_position = obj_line_position + (perp_vector * random.uniform(-40, 40))
-            obj = generate_object(obj_position)
+            obj_position = obj_line_position + (perp_vector * random.uniform(-object_distance, object_distance))
+            obj = generate_object(obj_position, difficulty)
             level_objects.append(obj)
     return (path_points, level_objects)
+
+
+
+class LevelManager:
+    def __init__(self):
+        self.difficulty = 0
+        self.path_points: list[Vector2] = []
+        self.level_objects: list[util.LevelObject] = []
+
+    def load_next_level(self):
+        self.difficulty += 1
+        self.path_points, self.level_objects = generate_level(self.difficulty)
+    
+    def reset(self):
+        self.__init__()
+
+
+level_manager = LevelManager()
